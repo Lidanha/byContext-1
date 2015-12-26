@@ -5,60 +5,64 @@ class QueryHandlerTests extends FunSuite with Matchers{
   val emptyctx = QueryContext()
 
   test("ss"){
-    val res = new QueryHandler()
-      .query(emptyctx, Leaf("root", "root", SingleValueProvider("root value")))
+    val writer = new MapObjectWriter()
+    new QueryHandler()
+      .query(emptyctx, LeafNode("root", "root", SingleValueProvider("root value")), writer)
 
-    println(res)
+    println(writer.targetMap)
 
-    res should be (Map("root" -> "root value"))
+    writer.targetMap should be (Map("root" -> "root value"))
   }
   test("a1"){
-    val res = new QueryHandler()
+    val writer = new MapObjectWriter()
+    new QueryHandler()
       .query(emptyctx,
-        DataObject(Map(
-          "child1" -> Leaf("child1", "child1", SingleValueProvider("child1"))
+        DataObjectNode(Map(
+          "child1" -> LeafNode("child1", "child1", SingleValueProvider("child1"))
         )
-        )
+        ), writer
       )
 
-    println(res)
+    println(writer.targetMap)
 
-    res should be (
+    writer.targetMap should be (
       Map("child1" -> "child1")
     )
   }
   test("a2"){
-    val res = new QueryHandler()
+    val writer = new MapObjectWriter()
+    new QueryHandler()
       .query(emptyctx,
-        DataObject(Map(
-          "root" -> DataObject(Map("child1" -> Leaf("child1", "root.child1", SingleValueProvider("child1"))))
+        DataObjectNode(Map(
+          "root" -> DataObjectNode(Map("child1" -> LeafNode("child1", "root.child1", SingleValueProvider("child1"))))
         )
-        )
+        ), writer
       )
 
-    println(res)
+    println(writer.targetMap)
 
-    res should be (
+    writer.targetMap should be (
       Map("root" -> Map("child1" -> "child1"))
     )
   }
   test("a3"){
-    val res = new QueryHandler()
+    val writer = new MapObjectWriter()
+    new QueryHandler()
       .query(emptyctx,
-        DataObject(Map(
-          "root" -> DataObject(Map(
-            "child1" -> DataObject(Map(
-              "child1.1" -> Leaf("child1.1", "root.child1.child1.1", SingleValueProvider("child1.1")),
-              "child1.2" -> Leaf("child1.2", "root.child1.child1.2", SingleValueProvider("child1.2"))
+        DataObjectNode(Map(
+          "root" -> DataObjectNode(Map(
+            "child1" -> DataObjectNode(Map(
+              "child1.1" -> LeafNode("child1.1", "root.child1.child1.1", SingleValueProvider("child1.1")),
+              "child1.2" -> LeafNode("child1.2", "root.child1.child1.2", SingleValueProvider("child1.2"))
             )
           ))
         )
         )
-      ))
+      ), writer)
 
-    println(res)
+    println(writer.targetMap)
 
-    res should be (
+    writer.targetMap should be (
       Map("root" ->
         Map("child1" ->
           Map(

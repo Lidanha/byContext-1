@@ -1,13 +1,11 @@
 package byContext.score
 
-import scala.collection.mutable
-
 trait Node{}
 case class LeafNode(name: String, path:String, value:ValueProvider) extends Node
 case class DataObjectNode(nodes:Map[String, Node]) extends Node
-case class DataObject(nodes:Map[String, Node]) extends Node
+case class ArrayNode(nodes:Array[AnyRef]) extends Node
 
-object AddValueToMap{
+/*object AddValueToMap{
   trait AddArrayTo{
     def add(value:AnyRef)
   }
@@ -18,11 +16,11 @@ object AddValueToMap{
     override def add(value: AnyRef): Unit = targetList += value
   }
 
-  def apply(name:String, value:Value, writer: Writer):Unit = {
+  def apply(name:String, value:Value, writer: ObjectWriter):Unit = {
     addValue(name, value, writer)
   }
 
-  private def addValue(name:String, value: Value, writer: Writer) : Unit = {
+  private def addValue(name:String, value: Value, writer: ObjectWriter) : Unit = {
     value match {
       case v:SingleValue =>
         addSingleValue(name, v, writer)
@@ -33,7 +31,7 @@ object AddValueToMap{
     }
   }
 
-  private def addArrayValue(name:String, addTo: AddArrayTo, value:ArrayValue, writer: Writer) : Unit= {
+  private def addArrayValue(name:String, addTo: AddArrayTo, value:ArrayValue, writer: ObjectWriter) : Unit= {
     val list = mutable.ListBuffer[AnyRef]()
     addTo add list
 
@@ -49,24 +47,28 @@ object AddValueToMap{
     }
   }
 
-  private def addSingleValue(name:String, value:SingleValue, writer: Writer) : Unit =
+  private def addSingleValue(name:String, value:SingleValue, writer: ObjectWriter) : Unit =
     writer.property(name, value.actualValue)
 
-  private def addObjectValue(name:String, value:ObjectValue, writer: Writer) : Unit =
+  private def addObjectValue(name:String, value:ObjectValue, writer: ObjectWriter) : Unit =
     value.actualValue.foreach{kv=>
       val (childName,childValue) = kv
       addValue(childName, childValue, writer)
     }
-}
+}*/
 
 class QueryHandler{
-  def query(ctx:QueryContext, node: Node, writer: Writer) : Unit = processNode(ctx, node, writer)
+  def query(ctx:QueryContext, node: Node, writer: ObjectWriter) : Unit = processNode(ctx, node, writer)
 
-  private def processNode(ctx:QueryContext, node:Node, writer: Writer) : Unit = {
-    def processLeaf(leaf: LeafNode, leafWriter:Writer): Unit = {
+  private def processNode(ctx:QueryContext, node:Node, writer: ObjectWriter) : Unit = {
+    def processLeaf(leaf: LeafNode, leafWriter:ObjectWriter): Unit = {
       leaf.value.get(ctx) fold(error => ???, {
-        value => AddValueToMap(leaf.name, value, leafWriter)
+        value => leafWriter.property(leaf.name, value.asInstanceOf[SingleValue].actualValue)
       })
+    }
+
+    def processArray(arrayNode: ArrayNode, arrayWriter:ArrayWriter) : Unit = {
+      arrayNode.nodes.foreach(arrayWriter.append)
     }
 
     node match {
@@ -81,6 +83,7 @@ class QueryHandler{
             case (name, child : DataObjectNode) =>
               val childWriter = writer.createObjectWriter(name)
               processNode(ctx, child, childWriter)
+            case (name, arrayChild : ArrayNode) => processArray(arrayChild, writer.createArrayWriter(name))
           }
         }
     }

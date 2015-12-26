@@ -1,3 +1,4 @@
+/*
 import byContext.score._
 import org.scalatest.{Matchers, FunSuite}
 
@@ -18,3 +19,4 @@ class AddValueToMapTests extends FunSuite with Matchers {
     target.foreach(kv => println(s"${kv._1} -> ${kv._2}"))
   }
 }
+*/
