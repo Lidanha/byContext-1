@@ -11,7 +11,7 @@ class QueryHandlerTests extends FunSuite with Matchers{
   test("a1"){
     val writer = new ObjectWriter(collection.mutable.Map[String,Any]())
     new QueryHandler()
-      .query(emptyctx, Map("root" -> Single(provider("root value"))), writer)
+      .query(emptyctx, Map("root" -> SingleFiltered(provider("root value"))), writer)
 
     println(writer.map)
 
@@ -20,7 +20,7 @@ class QueryHandlerTests extends FunSuite with Matchers{
   test("a2"){
     val writer = new ObjectWriter(collection.mutable.Map[String,Any]())
     new QueryHandler()
-      .query(emptyctx,Map("root" -> DataObjectFiltered(provider(Array("child1" -> "child1")))), writer)
+      .query(emptyctx,Map("root" -> ObjectFiltered(provider(Array("child1" -> "child1")))), writer)
 
     println(writer.map)
 
@@ -30,8 +30,8 @@ class QueryHandlerTests extends FunSuite with Matchers{
     val writer = new ObjectWriter(collection.mutable.Map[String,Any]())
     new QueryHandler()
       .query(emptyctx,Map("root" ->
-        DataObjectFiltered(provider(Array("child1" ->
-          DataObjectFiltered(provider(Array(
+        ObjectFiltered(provider(Array("child1" ->
+          ObjectFiltered(provider(Array(
             "child1.1" -> "child1.1",
             "child1.2" -> "child1.2"
           )))
