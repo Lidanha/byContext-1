@@ -1,4 +1,4 @@
-package byContext.score.rules
+package byContext.rules
 
 import byContext.score.ValueRelevancy._
 import byContext.score.{QueryContext, FilterRule, ValueRelevancy}
