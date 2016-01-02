@@ -1,0 +1,17 @@
+{
+  "some-object":{
+    "raw-prop":"val",
+    "single-filtered":{
+      "byContext-metadata":{"type":"single"},
+      "values":[{"v":"/var/logs", "rules":[{"equals":{"env":"dev"}}, {"not-equals":{"os":"*"}}]}]
+    },
+    "some-array" : {
+      "byContext-metadata":{"type":"array"},
+      "values":[{"v":"/var/logs", "rules":[{"equals":{"env":"dev"}}, {"not-equals":{"os":"*"}}]}]
+    },
+    "some-map" : {
+      "byContext-metadata":{"type":"map"},
+      "values":[{"v":{"key1":"value1"}, "rules":[]}]
+    }
+  }
+}
