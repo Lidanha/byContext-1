@@ -1,5 +1,6 @@
 import byContext.score._
 import byContext._
+import byContext.writers.ObjectWriter
 import org.scalatest.{FunSuite, Matchers}
 
 class QueryHandlerTests extends FunSuite with Matchers{

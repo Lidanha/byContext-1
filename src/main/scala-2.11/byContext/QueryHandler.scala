@@ -1,7 +1,7 @@
 package byContext
 
 import byContext.score.QueryContext
-
+import byContext.writers.{ObjectWriter, Writer}
 
 class QueryHandler{
   def query(ctx:QueryContext, data:Map[String,Any], writer: ObjectWriter) : Unit = process(data, writer)(ctx)
