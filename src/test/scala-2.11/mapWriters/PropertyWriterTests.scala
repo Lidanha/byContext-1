@@ -1,10 +1,12 @@
+package mapWriters
+
 import byContext.writers.WriterUnsupportedOperationException
-import byContext.writers.map.{MapObjectWriter, MapCollectionWriter, MapPropertyWriter}
+import byContext.writers.map.{MapCollectionWriter, MapObjectWriter, MapPropertyWriter}
 import org.scalatest.{FlatSpec, Matchers}
 
 import scala.collection._
 
-class PropertyWriterTests  extends FlatSpec with Matchers{
+class PropertyWriterTests extends FlatSpec with Matchers{
 
   "MapPropertyWriter" should "not change map if no method had been called on him" in {
     val writer = new MapPropertyWriter(mutable.Map(), "prop")
