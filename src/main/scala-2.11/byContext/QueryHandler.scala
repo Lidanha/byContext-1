@@ -1,10 +1,11 @@
 package byContext
 
 import byContext.score.QueryContext
-import byContext.writers.{ObjectWriter, Writer}
+import byContext.writers.Writer
+import byContext.writers.map.MapObjectWriter
 
 class QueryHandler{
-  def query(ctx:QueryContext, data:Map[String,Any], writer: ObjectWriter) : Unit = process(data, writer)(ctx)
+  def query(ctx:QueryContext, data:Map[String,Any], writer: MapObjectWriter) : Unit = process(data, writer)(ctx)
 
   private def process(data:Any, writer: Writer)(implicit ctx:QueryContext) : Unit = {
     data match {

@@ -83,7 +83,7 @@ class MultiplePossibleValuesValueProviderTests extends FunSuite with Matchers wi
 
     res.left.get should be (RequiredValueMissingError())
   }
-  test("for empty ValueWithScore and required = false, MultiplePossibleValuesValueProvider should return MissingValue"){
+  test("for empty ValueWithScore and required = false, MultiplePossibleValuesValueProvider should return None"){
     val calculator = stub[ScoreCalculator]
 
     (calculator.calculateScoreForRelevantValues _)

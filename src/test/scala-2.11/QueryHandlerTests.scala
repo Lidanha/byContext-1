@@ -1,6 +1,6 @@
 import byContext.score._
 import byContext._
-import byContext.writers.ObjectWriter
+import byContext.writers.map.MapObjectWriter
 import org.scalatest.{FunSuite, Matchers}
 
 class QueryHandlerTests extends FunSuite with Matchers{
@@ -10,25 +10,21 @@ class QueryHandlerTests extends FunSuite with Matchers{
     override def get(ctx: QueryContext): Either[ByContextError, Any] = Right(value)
   }
   test("a1"){
-    val writer = new ObjectWriter(collection.mutable.Map[String,Any]())
+    val writer = new MapObjectWriter(collection.mutable.Map[String,Any]())
     new QueryHandler()
       .query(emptyctx, Map("root" -> SingleFiltered(provider("root value"))), writer)
-
-    println(writer.map)
 
     writer.map should be (collection.mutable.Map("root" -> "root value"))
   }
   test("a2"){
-    val writer = new ObjectWriter(collection.mutable.Map[String,Any]())
+    val writer = new MapObjectWriter(collection.mutable.Map[String,Any]())
     new QueryHandler()
       .query(emptyctx,Map("root" -> ObjectFiltered(provider(Array("child1" -> "child1")))), writer)
-
-    println(writer.map)
 
     writer.map should be (collection.mutable.Map("root" -> Map("child1" -> "child1")))
   }
   test("a3"){
-    val writer = new ObjectWriter(collection.mutable.Map[String,Any]())
+    val writer = new MapObjectWriter(collection.mutable.Map[String,Any]())
     new QueryHandler()
       .query(emptyctx,Map("root" ->
         ObjectFiltered(provider(Array("child1" ->
@@ -39,8 +35,6 @@ class QueryHandlerTests extends FunSuite with Matchers{
           )))
 
       ), writer)
-
-    println(writer.map)
 
     writer.map should be (
       collection.mutable.Map("root" ->

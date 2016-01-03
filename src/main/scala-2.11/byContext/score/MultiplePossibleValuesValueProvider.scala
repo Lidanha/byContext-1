@@ -1,6 +1,6 @@
 package byContext.score
 
-import byContext.ValueProvider
+import byContext.{ByContextError, ValueProvider}
 
 class MultiplePossibleValuesValueProvider(calculator: ScoreCalculator,
                                           possibleValues:Array[PossibleValue],
