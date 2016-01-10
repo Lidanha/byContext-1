@@ -9,10 +9,11 @@ class QueryHandler{
 
   private def process(data:Any, writer: Writer)(implicit ctx:QueryContext) : Unit = {
     data match {
-      case obj:Map[String,Any] => obj.foreach{x=>
-        val (name, value) = x
-        process(value, writer.getPropertyWriter(name))
-      }
+      case obj:Map[String,Any] =>
+        obj.foreach{x=>
+          val (name, value) = x
+          process(value, writer.getPropertyWriter(name))
+        }
       case collection : Array[Any] =>
         val collectionWriter = writer.getCollectionWriter()
         collection.foreach(value => process(value, collectionWriter))
