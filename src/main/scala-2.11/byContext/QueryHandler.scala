@@ -1,10 +1,11 @@
 package byContext
 
-import byContext.score.QueryContext
+import byContext.score.{ObjectValueContainer, ArrayValueContainer, SingleValueContainer, QueryContext}
 import byContext.writers.Writer
 import byContext.writers.map.MapObjectWriter
+import com.typesafe.scalalogging.StrictLogging
 
-class QueryHandler{
+class QueryHandler extends StrictLogging{
   def query(ctx:QueryContext, data:Map[String,Any], writer: MapObjectWriter) : Unit = process(data, writer)(ctx)
 
   private def process(data:Any, writer: Writer)(implicit ctx:QueryContext) : Unit = {
@@ -17,17 +18,21 @@ class QueryHandler{
       case collection : Array[Any] =>
         val collectionWriter = writer.getCollectionWriter()
         collection.foreach(value => process(value, collectionWriter))
-      case SingleFiltered(provider) =>
-        provider.get(ctx).fold(err => ???,value=>process(value, writer))
-      case ArrayFiltered(provider) => provider.get(ctx).fold(err => ???, value => {
-        val filteredArray = value.asInstanceOf[Array[Any]]
-        val collectionWriter = writer.getCollectionWriter()
-        filteredArray.foreach(value => process(value, collectionWriter))
+      case container:SingleValueContainer =>
+        container.get(ctx).fold(err=>{
+          logger.error("error",err)
+          throw err
+        },value => process(value, writer))
+      case container:ArrayValueContainer =>
+        container.get(ctx).fold(err => {
+          logger.error("error",err)
+          throw err
+        }, values => {
+        values.foreach(value => process(value, writer.getCollectionWriter()))
       })
-      case ObjectFiltered(provider) => provider.get(ctx).fold(err => ???, value => {
-        val filteredArray = value.asInstanceOf[Array[(String,Any)]]
+      case container:ObjectValueContainer => container.get(ctx).fold(err => ???, values => {
         val objectWriter = writer.getObjectWriter()
-        filteredArray.foreach{x=>
+        values.foreach{x=>
           val (name, value) = x
           process(value, objectWriter.getPropertyWriter(name))
         }

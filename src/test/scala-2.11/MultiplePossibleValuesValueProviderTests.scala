@@ -1,3 +1,4 @@
+/*
 import byContext.score._
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.{EitherValues, FunSuite, Matchers}
@@ -95,3 +96,4 @@ class MultiplePossibleValuesValueProviderTests extends FunSuite with Matchers wi
     res shouldBe (Right(None))
   }
 }
+*/
