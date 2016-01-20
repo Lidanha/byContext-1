@@ -1,6 +1,6 @@
 package byContext.score.valueContainers
 
-import byContext.ByContextError
+import byContext._
 import byContext.score._
 
 class DefaultSingleValueContainer(calculator: ScoreCalculator, possibleValues:Array[PossibleValue],

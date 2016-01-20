@@ -1,7 +1,7 @@
 package byContext.rules
 
-import byContext.score.ValueRelevancy._
-import byContext.score.{QueryContext, FilterRule, ValueRelevancy}
+import byContext.{FilterRule, QueryContext, ValueRelevancy}
+import ValueRelevancy._
 
 class ExactTextMatchRule(val subject:String, val value:String) extends FilterRule{
   override def evaluate(ctx: QueryContext): ValueRelevancy =

@@ -1,6 +1,6 @@
-package byContext.score
+package byContext
 
-import byContext.score.ValueRelevancy.ValueRelevancy
+import byContext.ValueRelevancy.ValueRelevancy
 
 case class QueryContext(ctx:Map[String,String] = Map())
 

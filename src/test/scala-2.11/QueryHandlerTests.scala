@@ -1,6 +1,5 @@
-import byContext.score._
 import byContext._
-import byContext.score.valueContainers.{SingleValueContainer, ObjectValueContainer}
+import byContext.score.valueContainers.{ObjectValueContainer, SingleValueContainer}
 import byContext.writers.map.MapObjectWriter
 import org.scalatest.{FunSuite, Matchers}
 

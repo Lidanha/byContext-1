@@ -1,7 +1,6 @@
 package byContext
 
 import byContext.score.valueContainers.{SingleValueContainer, ObjectValueContainer, ArrayValueContainer}
-import byContext.score.QueryContext
 import byContext.writers.Writer
 import byContext.writers.map.MapObjectWriter
 import com.typesafe.scalalogging.StrictLogging

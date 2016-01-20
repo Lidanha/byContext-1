@@ -1,6 +1,4 @@
-package byContext.score
-
-import byContext.ByContextError
+package byContext
 
 case class MultipleValuesNotAllowedError() extends ByContextError
 case class RequiredValueMissingError() extends ByContextError

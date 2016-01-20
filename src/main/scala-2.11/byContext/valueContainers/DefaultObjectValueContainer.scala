@@ -1,7 +1,7 @@
 package byContext.score.valueContainers
 
-import byContext.ByContextError
-import byContext.score.{MinimumResultItemsCountError, QueryContext, PossibleValue, ScoreCalculator}
+import byContext.{MinimumResultItemsCountError, PossibleValue, QueryContext, ByContextError}
+import byContext.score.{ScoreCalculator}
 
 class DefaultObjectValueContainer(calculator: ScoreCalculator,
                                   possibleValues:Array[PossibleValue],

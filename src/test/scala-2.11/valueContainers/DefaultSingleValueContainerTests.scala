@@ -1,5 +1,6 @@
 package valueContainers
 
+import byContext.{RequiredValueMissingError, MultipleValuesNotAllowedError, PossibleValue, QueryContext}
 import byContext.score._
 import byContext.score.valueContainers.DefaultSingleValueContainer
 import org.scalamock.scalatest.MockFactory

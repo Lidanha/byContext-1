@@ -1,5 +1,6 @@
 package valueContainers
 
+import byContext.{MinimumResultItemsCountError, PossibleValue, QueryContext}
 import byContext.score.valueContainers.DefaultArrayValueContainer
 import byContext.score._
 import org.scalamock.scalatest.MockFactory

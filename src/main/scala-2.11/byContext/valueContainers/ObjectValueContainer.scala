@@ -1,7 +1,6 @@
 package byContext.score.valueContainers
 
-import byContext.ByContextError
-import byContext.score.QueryContext
+import byContext.{QueryContext, ByContextError}
 
 trait ObjectValueContainer {
   def get(ctx:QueryContext) : Either[ByContextError,Array[(String,Any)]]

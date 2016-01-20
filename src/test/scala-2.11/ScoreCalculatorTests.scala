@@ -1,4 +1,5 @@
-import byContext.score.ValueRelevancy.ValueRelevancy
+import byContext.{PossibleValue, FilterRule, QueryContext, ValueRelevancy}
+import ValueRelevancy.ValueRelevancy
 import byContext.score._
 import org.scalatest.{FunSuite, Matchers}
 

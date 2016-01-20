@@ -1,5 +1,5 @@
+import byContext.{ValueRelevancy, QueryContext}
 import byContext.rules.ExactTextMatchRule
-import byContext.score.{ValueRelevancy, QueryContext}
 import org.scalatest.{FunSuite, _}
 
 class ExactTextMatchTests extends FunSuite with Matchers{
