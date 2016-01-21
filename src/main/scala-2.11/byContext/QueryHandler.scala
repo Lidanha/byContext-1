@@ -1,6 +1,7 @@
 package byContext
 
 import byContext.score.valueContainers.{SingleValueContainer, ObjectValueContainer, ArrayValueContainer}
+import byContext.valueContainers.RawValueContainer
 import byContext.writers.Writer
 import byContext.writers.map.MapObjectWriter
 import com.typesafe.scalalogging.StrictLogging
@@ -39,7 +40,7 @@ class QueryHandler extends StrictLogging{
       })
 
       case None => writer.write(None)
-      case Raw(value) => writer.write(value)
+      case RawValueContainer(value) => writer.write(value)
     }
   }
 }
