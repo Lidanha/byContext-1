@@ -2,7 +2,7 @@ package byContext.score.valueContainers
 
 import byContext.{MinimumResultItemsCountError, PossibleValue, QueryContext, ByContextError}
 import byContext.score.{ScoreCalculator}
-
+//TODO:consider the need for this class, it does the same as ArrayValueContainer with the addition of casting the result into a tuple
 class DefaultObjectValueContainer(calculator: ScoreCalculator,
                                   possibleValues:Array[PossibleValue],
                                   minResultItemsCount:Int) extends ObjectValueContainer{

@@ -40,7 +40,6 @@ class QueryHandler extends StrictLogging{
 
       case None => writer.write(None)
       case Raw(value) => writer.write(value)
-      case value : String => writer.write(value)
     }
   }
 }
