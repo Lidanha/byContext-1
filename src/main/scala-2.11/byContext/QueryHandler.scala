@@ -6,7 +6,7 @@ import byContext.writers.map.MapObjectWriter
 import com.typesafe.scalalogging.StrictLogging
 
 class QueryHandler extends StrictLogging{
-  def query(ctx:QueryContext, data:Map[String,Any], writer: MapObjectWriter) : Unit = process(data, writer)(ctx)
+  def query(ctx:QueryContext, data:Any, writer: MapObjectWriter) : Unit = process(data, writer)(ctx)
 
   private def process(data:Any, writer: Writer)(implicit ctx:QueryContext) : Unit = {
     data match {
