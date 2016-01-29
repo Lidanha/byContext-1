@@ -1,13 +1,12 @@
 package byContext
 
-import byContext.score.valueContainers.{SingleValueContainer, ObjectValueContainer, ArrayValueContainer}
+import byContext.score.valueContainers.{ArrayValueContainer, ObjectValueContainer, SingleValueContainer}
 import byContext.valueContainers.RawValueContainer
 import byContext.writers.Writer
-import byContext.writers.map.MapObjectWriter
 import com.typesafe.scalalogging.StrictLogging
 
-class QueryHandler extends StrictLogging{
-  def query(ctx:QueryContext, data:Any, writer: MapObjectWriter) : Unit = process(data, writer)(ctx)
+class RecursiveQueryHandler extends StrictLogging{
+  def query(ctx:QueryContext, data:Any, writer: Writer) : Unit = process(data, writer)(ctx)
 
   private def process(data:Any, writer: Writer)(implicit ctx:QueryContext) : Unit = {
     data match {

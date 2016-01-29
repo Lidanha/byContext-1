@@ -9,7 +9,7 @@ class QueryHandlerTests extends FunSuite with Matchers{
 
   def input(map:Map[String,Any]) : collection.mutable.Map[String,Any] = {
     val writer = new MapObjectWriter(collection.mutable.Map[String,Any]())
-    new QueryHandler().query(emptyctx,map, writer)
+    new RecursiveQueryHandler().query(emptyctx,map, writer)
     writer.map
   }
   def single(value:RawValueContainer): SingleValueContainer = new SingleValueContainer {
