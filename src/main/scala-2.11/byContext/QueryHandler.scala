@@ -5,7 +5,10 @@ import byContext.valueContainers.RawValueContainer
 import byContext.writers.Writer
 import com.typesafe.scalalogging.StrictLogging
 
-class RecursiveQueryHandler extends StrictLogging{
+trait QueryHandler{
+  def query(ctx:QueryContext, data:Any, writer: Writer) : Unit
+}
+class RecursiveQueryHandler extends QueryHandler with StrictLogging{
   def query(ctx:QueryContext, data:Any, writer: Writer) : Unit = process(data, writer)(ctx)
 
   private def process(data:Any, writer: Writer)(implicit ctx:QueryContext) : Unit = {
