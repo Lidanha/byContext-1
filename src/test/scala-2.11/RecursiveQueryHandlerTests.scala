@@ -4,7 +4,7 @@ import byContext.valueContainers.RawValueContainer
 import byContext.writers.map.MapObjectWriter
 import org.scalatest.{FunSuite, Matchers}
 
-class QueryHandlerTests extends FunSuite with Matchers{
+class RecursiveQueryHandlerTests extends FunSuite with Matchers{
   val emptyctx = QueryContext()
 
   def input(map:Map[String,Any]) : collection.mutable.Map[String,Any] = {

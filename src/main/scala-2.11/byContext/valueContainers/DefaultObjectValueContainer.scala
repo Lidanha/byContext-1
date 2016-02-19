@@ -1,16 +1,18 @@
 package byContext.score.valueContainers
 
-import byContext.{MinimumResultItemsCountError, PossibleValue, QueryContext, ByContextError}
-import byContext.score.{ScoreCalculator}
+import byContext.score.ScoreCalculator
+import byContext.{ByContextError, PossibleValue, QueryContext}
 //TODO:consider the need for this class, it does the same as ArrayValueContainer with the addition of casting the result into a tuple
 class DefaultObjectValueContainer(calculator: ScoreCalculator,
                                   possibleValues:Array[PossibleValue],
-                                  minResultItemsCount:Int) extends ObjectValueContainer{
+                                  minResultItemsCount:Int)
+  extends ObjectValueContainer {
   override def get(ctx: QueryContext): Either[ByContextError, Array[(String,Any)]] = {
-    calculator.calculateScoreForRelevantValues(ctx, possibleValues) match {
-      case res if res.size < minResultItemsCount => Left(new MinimumResultItemsCountError())
-        //TODO: needs to think of a better design to avoid this cast
-      case res => Right(res.map(_.value.asInstanceOf[(String,Any)]))
+    val arrayContainer = new DefaultArrayValueContainer(calculator,possibleValues, minResultItemsCount)
+    arrayContainer.get(ctx) match {
+      case left @ Left(e) => Left(e)
+        //TODO:think of a way to avoid this cast, maybe add validation on creation, could also rely on validation on loading of data
+      case Right(res) => Right(res.map(_.asInstanceOf[(String,Any)]))
     }
   }
 }
