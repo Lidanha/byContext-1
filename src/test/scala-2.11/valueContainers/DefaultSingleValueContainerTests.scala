@@ -1,6 +1,6 @@
 package valueContainers
 
-import byContext.{RequiredValueMissingError, MultipleValuesNotAllowedError, PossibleValue, QueryContext}
+import byContext._
 import byContext.score._
 import byContext.score.valueContainers.DefaultSingleValueContainer
 import org.scalamock.scalatest.MockFactory
@@ -17,17 +17,22 @@ class DefaultSingleValueContainerTests extends WordSpecLike with Matchers with M
       .returns(values.map(ValueWithScore(_, 1)))
     calculator
   }
+  def selector() = new DefaultValueSelector {
+    override def select(valuesWithScore: Iterable[ValueWithScore]): Either[CouldNotSelectDefaultValueError, ValueWithScore] = {
+      Right(valuesWithScore.head)
+    }
+  }
 
   def single(values: Array[Any], required: Boolean): DefaultSingleValueContainer = {
-    new DefaultSingleValueContainer(calc(values), emptyValues, required)
+    new DefaultSingleValueContainer(calc(values), emptyValues, selector(), required)
   }
 
   "DefaultSingleValueContainer" must {
     "return a right with a single value when score calculator returns a single result" in {
       single(Array("a"), true).get(emptyctx).right.value should be("a")
     }
-    "return a left with MultipleValuesNotAllowedError when score calculator returns multiple values" in {
-      single(Array("a", "a"), true).get(emptyctx).left.value shouldBe a[MultipleValuesNotAllowedError]
+    "test the case that more than one value returns" in {
+      ???
     }
     "return a left with RequiredValueMissingError when score calculator returns no values and a value is required" in {
       single(Array.empty[Any], true).get(emptyctx).left.value shouldBe a[RequiredValueMissingError]
