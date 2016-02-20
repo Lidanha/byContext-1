@@ -3,10 +3,8 @@ package byContext.data
 import byContext.rules.ExactTextMatchRule
 import byContext.score.ScoreCalculator
 import byContext.score.valueContainers._
-import byContext.valueContainers.RawValueContainer
 import byContext.{HighestScoreDefaultValueSelector, FilterRule, PossibleValue}
 trait ScalaCodeDataSource {
-  def raw(v:Any):RawValueContainer = new RawValueContainer(v)
   def array(values:Any*)(minItemsCount:Int=1)(implicit calc:ScoreCalculator):ArrayValueContainer =
     new DefaultArrayValueContainer(calc,values.map(PossibleValue(_,Array.empty[FilterRule])).toArray,minItemsCount)
   def obj(values:(String,Any)*)(minItemsCount:Int=1)(implicit calc:ScoreCalculator):ObjectValueContainer =

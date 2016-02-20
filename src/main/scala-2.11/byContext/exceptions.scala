@@ -1,5 +1,8 @@
 package byContext
 
-case class CouldNotSelectDefaultValueError() extends ByContextError
+class DefaultValueSelectorError extends ByContextError
+case class MultipleValuesWithSameScoreError() extends DefaultValueSelectorError
+case class EmptyValuesWithScoreProvidedError() extends DefaultValueSelectorError
+
 case class RequiredValueMissingError() extends ByContextError
 case class MinimumResultItemsCountError() extends ByContextError

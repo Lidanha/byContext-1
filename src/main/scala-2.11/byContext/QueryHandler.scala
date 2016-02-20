@@ -1,7 +1,6 @@
 package byContext
 
 import byContext.score.valueContainers.{ArrayValueContainer, ObjectValueContainer, SingleValueContainer}
-import byContext.valueContainers.RawValueContainer
 import byContext.writers.Writer
 import com.typesafe.scalalogging.StrictLogging
 
@@ -25,7 +24,8 @@ class RecursiveQueryHandler extends QueryHandler with StrictLogging{
         container.get(ctx).fold(err=>{
           logger.error("error",err)
           throw err
-        },value => process(value, writer))
+        },
+          value => process(value, writer))
       case container:ArrayValueContainer =>
         container.get(ctx).fold(err => {
           logger.error("error",err)
@@ -42,7 +42,7 @@ class RecursiveQueryHandler extends QueryHandler with StrictLogging{
       })
 
       case None => writer.write(None)
-      case RawValueContainer(value) => writer.write(value)
+      case raw => writer.write(raw)
     }
   }
 }

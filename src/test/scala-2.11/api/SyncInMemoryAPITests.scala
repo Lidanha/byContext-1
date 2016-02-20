@@ -18,7 +18,7 @@ class SyncInMemoryAPITests extends WordSpecLike with Matchers with ScalaCodeData
     ),
     "3"->Map(
       "1"->Map(
-        "1"->raw("3.1.1"),
+        "1"->"3.1.1",
         "2"->single(
           v("1", "subj1" is "value1"),
           v("2", "subj2" is "value2")

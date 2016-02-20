@@ -1,6 +1,5 @@
 import byContext._
 import byContext.score.valueContainers.{ObjectValueContainer, SingleValueContainer}
-import byContext.valueContainers.RawValueContainer
 import byContext.writers.map.MapObjectWriter
 import org.scalatest.{FunSuite, Matchers}
 
@@ -12,7 +11,7 @@ class RecursiveQueryHandlerTests extends FunSuite with Matchers{
     new RecursiveQueryHandler().query(emptyctx,map, writer)
     writer.map
   }
-  def single(value:RawValueContainer): SingleValueContainer = new SingleValueContainer {
+  def single(value:Any): SingleValueContainer = new SingleValueContainer {
     override def get(ctx: QueryContext): Either[ByContextError, Any] = Right(value)
   }
   def obj(values:Array[(String,Any)]): ObjectValueContainer = new ObjectValueContainer {
@@ -22,12 +21,12 @@ class RecursiveQueryHandlerTests extends FunSuite with Matchers{
   test("one property -> single"){
     input(
       Map("root" ->
-        single(RawValueContainer("root value")))
+        single("root value"))
     ) should be (collection.mutable.Map("root" -> "root value"))
   }
   test("one property -> object with one property -> object value"){
     input(Map("root" ->
-      obj(Array("child1" -> RawValueContainer("child1")))
+      obj(Array("child1" -> "child1"))
     )
     ) should be (collection.mutable.Map("root" -> Map("child1" -> "child1")))
   }
@@ -35,8 +34,8 @@ class RecursiveQueryHandlerTests extends FunSuite with Matchers{
     input(Map("root" ->
       obj(Array("child1" ->
         obj(Array(
-          "child1.1" -> RawValueContainer("child1.1"),
-          "child1.2" -> RawValueContainer("child1.2")
+          "child1.1" -> "child1.1",
+          "child1.2" -> "child1.2"
         ))
       ))
 
