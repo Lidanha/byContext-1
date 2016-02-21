@@ -7,7 +7,7 @@ class DefaultSingleValueContainer(calculator: ScoreCalculator, possibleValues:Ar
                                   defaultValueSelector: DefaultValueSelector,
                                   isRequired:Boolean) extends SingleValueContainer{
   override def get(ctx: QueryContext): Either[ByContextError, Any] = {
-    calculator.calculateScoreForRelevantValues(ctx, possibleValues) match {
+    calculator.calculate(ctx, possibleValues) match {
       case res if res.size == 1 => Right(res.head.value)
       case res if res.size > 1 =>
         defaultValueSelector.select(res) match {

@@ -7,7 +7,7 @@ class DefaultArrayValueContainer(calculator: ScoreCalculator, possibleValues:Arr
   extends ArrayValueContainer{
 
   override def get(ctx: QueryContext): Either[ByContextError, Array[Any]] = {
-    calculator.calculateScoreForRelevantValues(ctx, possibleValues) match {
+    calculator.calculate(ctx, possibleValues) match {
       case res if res.size < minResultItemsCount => Left(new MinimumResultItemsCountError())
       case res => Right(res.map(_.value))
     }

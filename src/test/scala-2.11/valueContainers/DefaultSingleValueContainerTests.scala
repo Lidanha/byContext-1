@@ -12,7 +12,7 @@ class DefaultSingleValueContainerTests extends WordSpecLike with Matchers with M
 
   def calc(values: Array[Any]): ScoreCalculator = {
     val calculator = stub[ScoreCalculator]
-    (calculator.calculateScoreForRelevantValues _)
+    (calculator.calculate _)
       .when(emptyctx, emptyValues)
       .returns(values.map(ValueWithScore(_, 1)))
     calculator
@@ -37,7 +37,7 @@ class DefaultSingleValueContainerTests extends WordSpecLike with Matchers with M
       (selectorMock.select _).expects(valueWithScores.toIterable).returning(Right(ValueWithScore("1",1)))
 
       val calcStub = stub[ScoreCalculator]
-      (calcStub.calculateScoreForRelevantValues _).when(*,*).returns(valueWithScores)
+      (calcStub.calculate _).when(*,*).returns(valueWithScores)
       new DefaultSingleValueContainer(calcStub, emptyValues, selectorMock, true).get(emptyctx).right.value should be ("1")
 
       single(Array("a"), true).get(emptyctx).right.value should be("a")

@@ -12,7 +12,7 @@ class DefaultArrayValueContainerTests extends WordSpecLike with Matchers with Ei
 
   def calc(values: Array[Any]): ScoreCalculator = {
     val calculator = stub[ScoreCalculator]
-    (calculator.calculateScoreForRelevantValues _)
+    (calculator.calculate _)
       .when(emptyctx, emptyValues)
       .returns(values.map(ValueWithScore(_,1)))
     calculator

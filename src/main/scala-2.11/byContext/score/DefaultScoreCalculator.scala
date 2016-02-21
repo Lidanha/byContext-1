@@ -3,7 +3,7 @@ package byContext.score
 import byContext.{ValueRelevancy, PossibleValue, QueryContext}
 
 class DefaultScoreCalculator extends ScoreCalculator{
-  override def calculateScoreForRelevantValues(ctx: QueryContext, possibleValues:Array[PossibleValue]): Array[ValueWithScore] = {
+  override def calculate(ctx: QueryContext, possibleValues:Array[PossibleValue]): Array[ValueWithScore] = {
     possibleValues
       .map(v => (v.value, v.rules.map(_.evaluate(ctx))))
       .collect {
