@@ -67,7 +67,7 @@ class ScoreCalculatorTests extends FunSuite with Matchers{
     sorted(1).value should be ("b")
     sorted(1).score should be (0)
   }
-  test("for multiple ValueWithScore and allow multiple should return ??"){
+  test("two relevant values, return both"){
     val calcResult = new DefaultScoreCalculator().calculate(QueryContext(),
       Array(PossibleValue("a",Array(Rules.relevant)), PossibleValue("b",Array(Rules.relevant))))
 

@@ -35,7 +35,7 @@ class SyncInMemoryAPITests extends WordSpecLike with Matchers with ScalaCodeData
       res should be ("3.1.1")
     }
     "select the relevant value a couple of levels deep" in {
-      val res = Await.result(api.get("3.1.2",QueryContext(Map("subj1" -> "value1"))), 1 second)
+      val res = Await.result(api.get("3.1.2",QueryContext("subj1" -> "value1")), 1 second)
       res should be ("1")
     }
   }

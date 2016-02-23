@@ -1,6 +1,6 @@
 package byContext.data
 
-import byContext.rules.ExactTextMatchRule
+import byContext.rules.{NumberEquals, TextMatchRule}
 import byContext.score.ScoreCalculator
 import byContext.score.valueContainers._
 import byContext.{HighestScoreDefaultValueSelector, FilterRule, PossibleValue}
@@ -15,7 +15,10 @@ trait ScalaCodeDataSource {
   def v(value:Any, filterRules: FilterRule*):PossibleValue = PossibleValue(value, filterRules)
 
   implicit def textEquals(subject:String) = new {
-    def is(value:String) = new ExactTextMatchRule(subject, value)
+    def is(value:String) = new TextMatchRule(subject, value)
+  }
+  implicit def numberEquals(subject:String) = new {
+    def is(value:Double) = new NumberEquals(subject, value)
   }
 }
 

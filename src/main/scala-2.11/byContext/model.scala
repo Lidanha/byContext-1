@@ -2,7 +2,10 @@ package byContext
 
 import byContext.ValueRelevancy.ValueRelevancy
 
-case class QueryContext(ctx:Map[String,String] = Map())
+case class QueryContext(private val items:(String,Any)*){
+  val map = Map(items:_*)
+  def get(key:String):Option[Any] = map.get(key)
+}
 
 object ValueRelevancy extends Enumeration{
   type ValueRelevancy = Value
