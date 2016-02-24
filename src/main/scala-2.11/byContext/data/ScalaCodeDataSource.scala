@@ -1,9 +1,9 @@
 package byContext.data
 
-import byContext.rules.{NumberEquals, TextMatchRule}
+import byContext.rules.{NumberEquals, TextMatch}
 import byContext.score.ScoreCalculator
 import byContext.score.valueContainers._
-import byContext.{HighestScoreDefaultValueSelector, FilterRule, PossibleValue}
+import byContext.{FilterRule, HighestScoreDefaultValueSelector, PossibleValue}
 trait ScalaCodeDataSource {
   def array(values:Any*)(minItemsCount:Int=1)(implicit calc:ScoreCalculator):ArrayValueContainer =
     new DefaultArrayValueContainer(calc,values.map(PossibleValue(_,Array.empty[FilterRule])).toArray,minItemsCount)
@@ -15,7 +15,7 @@ trait ScalaCodeDataSource {
   def v(value:Any, filterRules: FilterRule*):PossibleValue = PossibleValue(value, filterRules)
 
   implicit def textEquals(subject:String) = new {
-    def is(value:String) = new TextMatchRule(subject, value)
+    def is(value:String) = new TextMatch(subject, value)
   }
   implicit def numberEquals(subject:String) = new {
     def is(value:Double) = new NumberEquals(subject, value)
