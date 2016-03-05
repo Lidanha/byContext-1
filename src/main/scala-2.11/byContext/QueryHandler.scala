@@ -13,9 +13,10 @@ class RecursiveQueryHandler extends QueryHandler with StrictLogging{
   private def process(data:Any, writer: Writer)(implicit ctx:QueryContext) : Unit = {
     data match {
       case obj:Map[String,Any] =>
+        val objectWriter = writer.getObjectWriter()
         obj.foreach{x=>
           val (name, value) = x
-          process(value, writer.getPropertyWriter(name))
+          process(value, objectWriter.getPropertyWriter(name))
         }
       case collection : Array[Any] =>
         val collectionWriter = writer.getCollectionWriter()
@@ -31,7 +32,8 @@ class RecursiveQueryHandler extends QueryHandler with StrictLogging{
           logger.error("error",err)
           throw err
         }, values => {
-        values.foreach(value => process(value, writer.getCollectionWriter()))
+          val collectionWriter = writer.getCollectionWriter()
+          values.foreach(value => process(value, collectionWriter))
       })
       case container:ObjectValueContainer => container.get(ctx).fold(err => ???, values => {
         val objectWriter = writer.getObjectWriter()

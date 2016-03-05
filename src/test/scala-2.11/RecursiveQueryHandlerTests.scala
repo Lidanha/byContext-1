@@ -1,15 +1,17 @@
 import byContext._
-import byContext.score.valueContainers.{ObjectValueContainer, SingleValueContainer}
-import byContext.writers.map.MapObjectWriter
-import org.scalatest.{FunSuite, Matchers}
+import byContext.score.valueContainers.{ArrayValueContainer, ObjectValueContainer, SingleValueContainer}
+import byContext.writers.map.MapRootWriterFactory
+import org.scalatest.{Matchers, WordSpecLike}
 
-class RecursiveQueryHandlerTests extends FunSuite with Matchers{
+import scala.collection.mutable.ListBuffer
+
+class RecursiveQueryHandlerTests extends WordSpecLike with Matchers{
   val emptyctx = QueryContext()
 
-  def input(map:Map[String,Any]) : collection.mutable.Map[String,Any] = {
-    val writer = new MapObjectWriter(collection.mutable.Map[String,Any]())
+  def input(map:Map[String,Any]) : Any = {
+    val writer = new MapRootWriterFactory()
     new RecursiveQueryHandler().query(emptyctx,map, writer)
-    writer.map
+    writer.getValue
   }
   def single(value:Any): SingleValueContainer = new SingleValueContainer {
     override def get(ctx: QueryContext): Either[ByContextError, Any] = Right(value)
@@ -17,34 +19,44 @@ class RecursiveQueryHandlerTests extends FunSuite with Matchers{
   def obj(values:Array[(String,Any)]): ObjectValueContainer = new ObjectValueContainer {
     override def get(ctx: QueryContext): Either[ByContextError, Array[(String, Any)]] = Right(values)
   }
-
-  test("one property -> single"){
-    input(
-      Map("root" ->
-        single("root value"))
-    ) should be (collection.mutable.Map("root" -> "root value"))
+  def arr(values:Iterable[Any]):ArrayValueContainer = new ArrayValueContainer {
+    override def get(ctx: QueryContext): Either[ByContextError, Array[Any]] = Right(values.toArray)
   }
-  test("one property -> object with one property -> object value"){
-    input(Map("root" ->
-      obj(Array("child1" -> "child1"))
-    )
-    ) should be (collection.mutable.Map("root" -> Map("child1" -> "child1")))
-  }
-  test("aa"){
-    input(Map("root" ->
-      obj(Array("child1" ->
-        obj(Array(
-          "child1.1" -> "child1.1",
-          "child1.2" -> "child1.2"
-        ))
-      ))
 
-    )) should be (
-      collection.mutable.Map("root" ->
-        collection.mutable.Map("child1" ->
-          collection.mutable.Map(
+  "RecursiveQueryHandler" must {
+    "one property -> single" in {
+      input(
+        Map("root" ->
+          single("root value"))
+      ) should be (collection.mutable.Map("root" -> "root value"))
+    }
+    "one property -> object with one property -> object value" in {
+      input(Map("root" ->
+        obj(Array("child1" -> "child1"))
+      )
+      ) should be (collection.mutable.Map("root" -> Map("child1" -> "child1")))
+    }
+    "aa" in {
+      input(Map("root" ->
+        obj(Array("child1" ->
+          obj(Array(
             "child1.1" -> "child1.1",
-            "child1.2" -> "child1.2")))
-    )
+            "child1.2" -> "child1.2"
+          ))
+        ))
+
+      )) should be (
+        collection.mutable.Map("root" ->
+          collection.mutable.Map("child1" ->
+            collection.mutable.Map(
+              "child1.1" -> "child1.1",
+              "child1.2" -> "child1.2")))
+      )
+    }
+    "arr" in {
+      input(Map("root" ->
+        arr(Array("child1","child2"))
+      )) should be (collection.mutable.Map("root" -> ListBuffer("child1","child2")))
+    }
   }
 }

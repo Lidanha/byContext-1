@@ -1,0 +1,3 @@
+package byContext.valueContainers
+
+trait ValueContainer
