@@ -1,30 +1,18 @@
-import byContext.{PossibleValue, FilterRule, QueryContext, ValueRelevancy}
-import ValueRelevancy.ValueRelevancy
 import byContext.score._
+import byContext.{FilterRule, PossibleValue, QueryContext}
 import org.scalatest.{FunSuite, Matchers}
+import rules.RulesTestsHelper
 
-class ScoreCalculatorTests extends FunSuite with Matchers{
-  object Rules{
-    val relevant = new AnyRef with FilterRule {
-      override def evaluate(ctx: QueryContext): ValueRelevancy = ValueRelevancy.Relevant
-    }
-    val notRelevant = new AnyRef with FilterRule {
-      override def evaluate(ctx: QueryContext): ValueRelevancy = ValueRelevancy.NotRelevant
-    }
-    val neutral = new AnyRef with FilterRule {
-      override def evaluate(ctx: QueryContext): ValueRelevancy = ValueRelevancy.Neutral
-    }
-  }
-
+class ScoreCalculatorTests extends FunSuite with Matchers with RulesTestsHelper{
   test("a single value with a single relevant rule should be selected"){
-    val calcResult = new DefaultScoreCalculator().calculate(QueryContext(), Array(PossibleValue("v", Array(Rules.relevant))))
+    val calcResult = new DefaultScoreCalculator().calculate(QueryContext(), Array(PossibleValue("v", Array(relevant))))
 
     calcResult.size should be (1)
     calcResult.head.score should be (1)
     calcResult.head.value should be ("v")
   }
   test("a single value with a single neutral rule should be selected"){
-    val calcResult = new DefaultScoreCalculator().calculate(QueryContext(), Array(PossibleValue("v", Array(Rules.neutral))))
+    val calcResult = new DefaultScoreCalculator().calculate(QueryContext(), Array(PossibleValue("v", Array(neutral))))
 
     calcResult.size should be (1)
     calcResult.head.score should be (0)
@@ -43,13 +31,13 @@ class ScoreCalculatorTests extends FunSuite with Matchers{
     calcResult.size should be (0)
   }
   test("a single value with a not relevant rule is not selected"){
-    val calcResult = new DefaultScoreCalculator().calculate(QueryContext(), Array(PossibleValue("a",Array(Rules.notRelevant))))
+    val calcResult = new DefaultScoreCalculator().calculate(QueryContext(), Array(PossibleValue("a",Array(notRelevant))))
 
     calcResult.size should be (0)
   }
   test("two values one has a relevant rule and the other with a not relevant rule selects the value with the relevant rule"){
     val calcResult = new DefaultScoreCalculator().calculate(QueryContext(),
-      Array(PossibleValue("a",Array(Rules.relevant)), PossibleValue("b",Array(Rules.notRelevant))))
+      Array(PossibleValue("a",Array(relevant)), PossibleValue("b",Array(notRelevant))))
 
     calcResult.size should be (1)
     calcResult.head.score should be (1)
@@ -57,7 +45,7 @@ class ScoreCalculatorTests extends FunSuite with Matchers{
   }
   test("two values one has a relevant rule and the other a neutral rule selects both, with higher score to the first"){
     val calcResult = new DefaultScoreCalculator().calculate(QueryContext(),
-      Array(PossibleValue("a",Array(Rules.relevant)), PossibleValue("b",Array(Rules.neutral))))
+      Array(PossibleValue("a",Array(relevant)), PossibleValue("b",Array(neutral))))
 
     calcResult.size should be (2)
     val sorted = calcResult.sortBy(_.score).reverse
@@ -69,7 +57,7 @@ class ScoreCalculatorTests extends FunSuite with Matchers{
   }
   test("two relevant values, return both"){
     val calcResult = new DefaultScoreCalculator().calculate(QueryContext(),
-      Array(PossibleValue("a",Array(Rules.relevant)), PossibleValue("b",Array(Rules.relevant))))
+      Array(PossibleValue("a",Array(relevant)), PossibleValue("b",Array(relevant))))
 
     calcResult.size should be (2)
     calcResult.head.score should be (1)

@@ -18,8 +18,10 @@ trait ScalaCodeDataSource {
     def relevantWhen(filterRules: FilterRule*) :PossibleValue = PossibleValue(value, filterRules)
   }
 
+  implicit def tupleToRule(tuple:Tuple1[FilterRule]) = tuple._1
+
   implicit def textEquals(subject:String) = new {
-    def is(value:String) = new TextMatch(subject, value)
+    def is(value:String) = TextMatch(subject->value)
   }
   implicit def numberEquals(subject:String) = new {
     def is(value:Double) = new NumberEquals(subject, value)
