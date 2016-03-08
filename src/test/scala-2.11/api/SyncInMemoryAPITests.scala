@@ -21,7 +21,11 @@ class SyncInMemoryAPITests extends WordSpecLike with Matchers with ScalaCodeData
         "1"->"3.1.1",
         "2"->single(
           "1" relevantWhen("subj1" is "value1"),
-          "2" relevantWhen("subj2" is "value2")
+          "2" relevantWhen("subj2" is "value2"),
+          "3" relevantWhen("subj2" isNot "value2")
+        )(true),
+        "3"->single(
+          "1" relevantWhen("subj1" isNot "value1")
         )(true)
       ),
       "2"-> Map(
@@ -45,6 +49,10 @@ class SyncInMemoryAPITests extends WordSpecLike with Matchers with ScalaCodeData
     "select the relevant value a couple of levels deep" in {
       val res = Await.result(api.get("3.1.2",QueryContext("subj1" -> "value1")), 1 second)
       res should be ("1")
+    }
+    "select the relevant value with a NOT container rule" in {
+      val res = Await.result(api.get("3.1.2",QueryContext("subj2" -> "value1")), 1 second)
+      res should be ("3")
     }
     "select the relevant values of an array" in {
       val res1 = Await.result(api.get("3.2.1",QueryContext("subj1" -> "value1")), 1 second)
