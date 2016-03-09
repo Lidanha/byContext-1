@@ -14,7 +14,7 @@ class DefaultSingleValueContainerTests extends WordSpecLike with Matchers with M
     val calculator = stub[ScoreCalculator]
     (calculator.calculate _)
       .when(emptyctx, emptyValues)
-      .returns(values.map(ValueWithScore(_, 1)))
+      .returns(values.map(ValueWithScore(_, 1, PossibleValueSettings())))
     calculator
   }
   def selector() = new DefaultValueSelector {
@@ -32,9 +32,9 @@ class DefaultSingleValueContainerTests extends WordSpecLike with Matchers with M
       single(Array("a"), true).get(emptyctx).right.value should be("a")
     }
     "calls DefaultValueSelector when more than one value returns and returns the value that is selected by DefaultValueSelector" in {
-      val valueWithScores = Array(ValueWithScore("1",1),ValueWithScore("2",2))
+      val valueWithScores = Array(ValueWithScore("1",1, PossibleValueSettings()),ValueWithScore("2",2, PossibleValueSettings()))
       val selectorMock = mock[DefaultValueSelector]
-      (selectorMock.select _).expects(valueWithScores.toIterable).returning(Right(ValueWithScore("1",1)))
+      (selectorMock.select _).expects(valueWithScores.toIterable).returning(Right(ValueWithScore("1",1, PossibleValueSettings())))
 
       val calcStub = stub[ScoreCalculator]
       (calcStub.calculate _).when(*,*).returns(valueWithScores)

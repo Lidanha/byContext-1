@@ -1,6 +1,6 @@
 package valueContainers
 
-import byContext.{MinimumResultItemsCountError, PossibleValue, QueryContext}
+import byContext.{PossibleValueSettings, MinimumResultItemsCountError, PossibleValue, QueryContext}
 import byContext.score.valueContainers.DefaultObjectValueContainer
 import byContext.score._
 import org.scalamock.scalatest.MockFactory
@@ -14,7 +14,7 @@ class DefaultObjectValueContainerTests extends WordSpecLike with Matchers with M
     val calculator = stub[ScoreCalculator]
     (calculator.calculate _)
       .when(emptyctx, emptyValues)
-      .returns(values.map(ValueWithScore(_, 1)))
+      .returns(values.map(ValueWithScore(_, 1, PossibleValueSettings())))
     calculator
   }
 

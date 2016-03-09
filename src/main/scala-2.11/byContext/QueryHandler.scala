@@ -23,7 +23,7 @@ class RecursiveQueryHandler extends QueryHandler with StrictLogging{
         collection.foreach(value => process(value, collectionWriter))
       case container:SingleValueContainer =>
         container.get(ctx).fold(err=>{
-          logger.error("error",err)
+          logger.error(s"failed processing query with context: ${ctx.toString()}, ${err.toString}",err)
           throw err
         },
           value => process(value, writer))
