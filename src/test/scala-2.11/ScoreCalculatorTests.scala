@@ -1,70 +1,85 @@
-import byContext.score._
-import byContext.{FilterRule, PossibleValue, QueryContext}
-import org.scalatest.{FunSuite, Matchers}
+import byContext.rules.{AndRuleContainer, NotRuleContainer, OrRuleContainer, TextMatch}
+import byContext.score.DefaultScoreCalculator
+import byContext.{PossibleValue, Probe, QueryContext}
+import org.scalamock.scalatest.MockFactory
+import org.scalatest.{Matchers, WordSpecLike}
 import rules.RulesTestsHelper
 
-class ScoreCalculatorTests extends FunSuite with Matchers with RulesTestsHelper{
-  test("a single value with a single relevant rule should be selected"){
-    val calcResult = new DefaultScoreCalculator().calculate(QueryContext(), Array(PossibleValue("v", Array(relevant))))
+class ScoreCalculatorTests extends WordSpecLike with Matchers with RulesTestsHelper with MockFactory{
+  import byContext.ValueRelevancy._
+  "ScoreCalculator" must {
+    "a single value with a single relevant rule should be selected" in {
+      val calcResult = new DefaultScoreCalculator().calculate(QueryContext(), Array(PossibleValue("v", Some(relevant))))
 
-    calcResult.size should be (1)
-    calcResult.head.score should be (1)
-    calcResult.head.value should be ("v")
+      calcResult.size should be (1)
+      calcResult.head.score should be (1)
+      calcResult.head.value should be ("v")
+    }
+    "a single value with a single neutral rule should be selected" in {
+      val calcResult = new DefaultScoreCalculator().calculate(QueryContext(), Array(PossibleValue("v", Some(neutral))))
+
+      calcResult.size should be (1)
+      calcResult.head.score should be (0)
+      calcResult.head.value should be ("v")
+    }
+    "a single value without rules should be selected" in {
+      val calcResult = new DefaultScoreCalculator().calculate(QueryContext(), Array(PossibleValue("v", None)))
+
+      calcResult.size should be (1)
+      calcResult.head.score should be (0)
+      calcResult.head.value should be ("v")
+    }
+    "an empty list of values should return an empty calc result" in {
+      val calcResult = new DefaultScoreCalculator().calculate(QueryContext(), Array.empty[PossibleValue])
+
+      calcResult.size should be (0)
+    }
+    "a single value with a not relevant rule is not selected" in {
+      val calcResult = new DefaultScoreCalculator().calculate(QueryContext(), Array(PossibleValue("a",Some(notRelevant))))
+
+      calcResult.size should be (0)
+    }
+    "two values one has a relevant rule and the other with a not relevant rule selects the value with the relevant rule" in {
+      val calcResult = new DefaultScoreCalculator().calculate(QueryContext(),
+        Array(PossibleValue("a",Some(relevant)), PossibleValue("b",Some(notRelevant))))
+
+      calcResult.size should be (1)
+      calcResult.head.score should be (1)
+      calcResult.head.value should be ("a")
+    }
+    "two values one has a relevant rule and the other a neutral rule selects both, with higher score to the first" in {
+      val calcResult = new DefaultScoreCalculator().calculate(QueryContext(),
+        Array(PossibleValue("a",Some(relevant)), PossibleValue("b",Some(neutral))))
+
+      calcResult.size should be (2)
+      val sorted = calcResult.sortBy(_.score).reverse
+      sorted.head.score should be (1)
+      sorted.head.value should be ("a")
+
+      sorted(1).value should be ("b")
+      sorted(1).score should be (0)
+    }
+    "two relevant values, return both" in {
+      val calcResult = new DefaultScoreCalculator().calculate(QueryContext(),
+        Array(PossibleValue("a",Some(relevant)), PossibleValue("b",Some(relevant))))
+
+      calcResult.size should be (2)
+      calcResult.head.score should be (1)
+      calcResult.head.value should be ("a")
+
+      calcResult(1).score should be (1)
+      calcResult(1).value should be ("b")
+    }
+    "and or" in {
+      val rule =
+        OrRuleContainer(
+        AndRuleContainer(TextMatch("subj1"->"value1"),NotRuleContainer(TextMatch("subj2"->"oo"))),
+        TextMatch("ss"->"22"))
+
+      val probe = mock[Probe]
+      (probe setRelevancy _).expects(Relevant).once()
+
+      rule.evaluate(QueryContext("ss"->"22"),probe)
+    }
   }
-  test("a single value with a single neutral rule should be selected"){
-    val calcResult = new DefaultScoreCalculator().calculate(QueryContext(), Array(PossibleValue("v", Array(neutral))))
-
-    calcResult.size should be (1)
-    calcResult.head.score should be (0)
-    calcResult.head.value should be ("v")
-  }
-  test("a single value without rules should be selected"){
-    val calcResult = new DefaultScoreCalculator().calculate(QueryContext(), Array(PossibleValue("v", Array.empty[FilterRule])))
-
-    calcResult.size should be (1)
-    calcResult.head.score should be (0)
-    calcResult.head.value should be ("v")
-  }
-  test("an empty list of values should return an empty calc result"){
-    val calcResult = new DefaultScoreCalculator().calculate(QueryContext(), Array.empty[PossibleValue])
-
-    calcResult.size should be (0)
-  }
-  test("a single value with a not relevant rule is not selected"){
-    val calcResult = new DefaultScoreCalculator().calculate(QueryContext(), Array(PossibleValue("a",Array(notRelevant))))
-
-    calcResult.size should be (0)
-  }
-  test("two values one has a relevant rule and the other with a not relevant rule selects the value with the relevant rule"){
-    val calcResult = new DefaultScoreCalculator().calculate(QueryContext(),
-      Array(PossibleValue("a",Array(relevant)), PossibleValue("b",Array(notRelevant))))
-
-    calcResult.size should be (1)
-    calcResult.head.score should be (1)
-    calcResult.head.value should be ("a")
-  }
-  test("two values one has a relevant rule and the other a neutral rule selects both, with higher score to the first"){
-    val calcResult = new DefaultScoreCalculator().calculate(QueryContext(),
-      Array(PossibleValue("a",Array(relevant)), PossibleValue("b",Array(neutral))))
-
-    calcResult.size should be (2)
-    val sorted = calcResult.sortBy(_.score).reverse
-    sorted.head.score should be (1)
-    sorted.head.value should be ("a")
-
-    sorted(1).value should be ("b")
-    sorted(1).score should be (0)
-  }
-  test("two relevant values, return both"){
-    val calcResult = new DefaultScoreCalculator().calculate(QueryContext(),
-      Array(PossibleValue("a",Array(relevant)), PossibleValue("b",Array(relevant))))
-
-    calcResult.size should be (2)
-    calcResult.head.score should be (1)
-    calcResult.head.value should be ("a")
-
-    calcResult(1).score should be (1)
-    calcResult(1).value should be ("b")
-  }
-
 }

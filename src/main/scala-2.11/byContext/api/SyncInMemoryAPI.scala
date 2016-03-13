@@ -14,6 +14,7 @@ class SyncInMemoryAPI(index:DataIndex, queryHandler: QueryHandler) extends ByCon
       case Some(IndexItem(nodeName, value)) => filter(nodeName, value, ctx)
     }
 
+    //TODO:fix use of global context
     implicit val exec = ExecutionContext.global
     f.onFailure{
       case t => logger.error(s"failed processing query with context: ${ctx.toString()}",t)

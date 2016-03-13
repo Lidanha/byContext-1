@@ -1,14 +1,19 @@
 package byContext.score
 
-import byContext.{ValueRelevancy, PossibleValue, QueryContext}
+import byContext._
 
 class DefaultScoreCalculator extends ScoreCalculator{
   override def calculate(ctx: QueryContext, possibleValues:Array[PossibleValue]): Array[ValueWithScore] = {
     possibleValues
-      .map(v => (v, v.rules.map(_.evaluate(ctx))))
+      .collect{
+        case v@PossibleValue(_, Some(rule),_) =>
+          val probe = new ProbeImpl()
+          rule.evaluate(ctx,probe)
+          (v,probe)
+      }
       .collect {
-        case (possibleValue:PossibleValue, rulesEvaluationResult) if !rulesEvaluationResult.exists(_ == ValueRelevancy.NotRelevant) =>
-          val score = rulesEvaluationResult.count(_ == ValueRelevancy.Relevant)
+        case (possibleValue, probe) if !(probe.getNotRelevantCount > 0) =>
+          val score = probe.getRelevantCount
 
           ValueWithScore(possibleValue.value, score, possibleValue.settings)
       }

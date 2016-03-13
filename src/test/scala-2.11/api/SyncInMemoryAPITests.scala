@@ -37,7 +37,11 @@ class SyncInMemoryAPITests extends WordSpecLike with Matchers with ScalaCodeData
           "5" relevantWhen("subj2" is "value2")
         )(1)
       )
-    )
+    ),
+    "4"->single(
+      "1".setAs.defaultValue.withRules(("subj1" is "value1" and "subj2".isNot("oo")) or("ss" is 22)),
+      "2".setAs.defaultValue.withRules(("subj1" is "value1" and "subj2".is("oo")) or("ss" is 22))
+    )(true)
   ))
   val api = new SyncInMemoryAPI(simpleIndex,new RecursiveQueryHandler())
 

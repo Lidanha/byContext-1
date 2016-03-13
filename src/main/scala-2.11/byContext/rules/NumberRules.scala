@@ -1,15 +1,16 @@
 package byContext.rules
 
-import byContext.ValueRelevancy.ValueRelevancy
-import byContext.{FilterRule, QueryContext, ValueRelevancy}
+import byContext.{FilterRule, Probe, QueryContext, ValueRelevancy}
+
 import scala.reflect.runtime.universe._
 
 abstract class NumberRule[T  <% Double](val subj:String, val v:T)(implicit tag:TypeTag[T]) extends FilterRule with VerifyType {
-  override def evaluate(ctx: QueryContext): ValueRelevancy = {
-    ctx.get(subj)
+  override def evaluate(ctx: QueryContext, probe: Probe): Unit = {
+    val valueRelevancy = ctx.get(subj)
       .fold(ValueRelevancy.Neutral){
         verify[T](_, contextValue => if (operator(contextValue, v)) ValueRelevancy.Relevant else ValueRelevancy.NotRelevant)
       }
+    probe setRelevancy valueRelevancy
   }
   protected def operator(contextValue:T, value:T):Boolean
 }
