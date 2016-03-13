@@ -25,4 +25,6 @@ trait FilterRule{
   def evaluate(ctx:QueryContext):ValueRelevancy
 }
 case class PossibleValueSettings(isDefault:Boolean=false)
-case class PossibleValue(value:Any, rules:Iterable[FilterRule], settings:PossibleValueSettings = PossibleValueSettings())
+case class PossibleValue(value:Any, rules:Iterable[FilterRule], settings:PossibleValueSettings = PossibleValueSettings()){
+  override def toString: String = value.toString
+}
