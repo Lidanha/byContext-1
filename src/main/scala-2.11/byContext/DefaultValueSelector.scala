@@ -25,7 +25,7 @@ class HighestScoreDefaultValueSelector extends DefaultValueSelector {
     if(valuesWithScore.isEmpty) {
       Left(EmptyValuesWithScoreProvidedError())
     }else{
-      val valuesWithMaxScore = extractValuesWithMacScore(valuesWithScore)
+      val valuesWithMaxScore = extractValuesWithMaxScore(valuesWithScore)
       valuesWithMaxScore.size match {
         case 1 => Right(valuesWithMaxScore.head)
         case size if size > 1 => Left(new MultipleValuesWithSameScoreError(valuesWithScore.toArray))
@@ -33,7 +33,7 @@ class HighestScoreDefaultValueSelector extends DefaultValueSelector {
     }
   }
 
-  def extractValuesWithMacScore(valuesWithScore: Iterable[ValueWithScore]): Iterable[ValueWithScore] = {
+  def extractValuesWithMaxScore(valuesWithScore: Iterable[ValueWithScore]): Iterable[ValueWithScore] = {
     val (_, valuesWithMaxScore) = valuesWithScore.foldLeft((-1, List[ValueWithScore]())) {
       (tuple, current) =>
         val (maxScore, values) = tuple

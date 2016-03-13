@@ -1,11 +1,12 @@
 package byContext.score
 
-import byContext._
+import byContext.{PossibleValue, ProbeImpl, QueryContext}
+import com.typesafe.scalalogging.StrictLogging
 
-class DefaultScoreCalculator extends ScoreCalculator{
+class DefaultScoreCalculator extends ScoreCalculator with StrictLogging{
   override def calculate(ctx: QueryContext, possibleValues:Array[PossibleValue]): Array[ValueWithScore] = {
     possibleValues
-      .collect{
+      .map{
         case v@PossibleValue(_, Some(rule),_) =>
           val probe = new ProbeImpl()
           rule.evaluate(ctx,probe)

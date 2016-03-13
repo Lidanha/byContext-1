@@ -23,7 +23,8 @@ class SyncInMemoryAPI(index:DataIndex, queryHandler: QueryHandler) extends ByCon
   }
 
   private def filter(nodeName:String, value:Any, ctx: QueryContext) = {
-    try {val rootWriter = new MapRootWriterFactory()
+    try {
+      val rootWriter = new MapRootWriterFactory()
       queryHandler.query(ctx, value,rootWriter)
       Future.successful(rootWriter.getValue)
     }
