@@ -4,10 +4,7 @@ import byContext.{ValueRelevancy, _}
 
 import scala.collection.mutable.ListBuffer
 
-object OrRuleContainer{
-  def apply(left:FilterRule, right:FilterRule) = new OrRuleContainer(left,right)
-}
-class OrRuleContainer (left:FilterRule, right:FilterRule) extends FilterRule {
+case class OrRuleContainer (left:FilterRule, right:FilterRule) extends FilterRule {
   override def evaluate(ctx: QueryContext, probe:Probe) : Unit = {
     import ValueRelevancy._
     val rels = ListBuffer[ValueRelevancy]()

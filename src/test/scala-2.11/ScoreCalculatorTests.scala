@@ -1,12 +1,10 @@
-import byContext.rules.{AndRuleContainer, NotRuleContainer, OrRuleContainer, TextMatch}
 import byContext.score.DefaultScoreCalculator
-import byContext.{PossibleValue, Probe, QueryContext}
+import byContext.{PossibleValue, QueryContext}
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.{Matchers, WordSpecLike}
 import rules.RulesTestsHelper
 
 class ScoreCalculatorTests extends WordSpecLike with Matchers with RulesTestsHelper with MockFactory{
-  import byContext.ValueRelevancy._
   "ScoreCalculator" must {
     "a single value with a single relevant rule should be selected" in {
       val calcResult = new DefaultScoreCalculator().calculate(QueryContext(), Array(PossibleValue("v", Some(relevant))))
@@ -69,19 +67,6 @@ class ScoreCalculatorTests extends WordSpecLike with Matchers with RulesTestsHel
 
       calcResult(1).score should be (1)
       calcResult(1).value should be ("b")
-    }
-    "and or" in {
-      val rule =
-        OrRuleContainer(
-          AndRuleContainer(TextMatch("subj1"->"value1"),NotRuleContainer(TextMatch("subj2"->"oo"))),
-          TextMatch("ss"->"22")
-        )
-
-      val probe = mock[Probe]
-      (probe setRelevancy _).expects(Neutral).twice()
-      (probe setRelevancy _).expects(Relevant).once()
-
-      rule.evaluate(QueryContext("ss"->"22"),probe)
     }
   }
 }

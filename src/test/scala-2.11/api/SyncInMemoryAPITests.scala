@@ -19,17 +19,17 @@ class SyncInMemoryAPITests extends WordSpecLike with Matchers with ScalaCodeData
     "3"->Map(
       "1"->Map(
         "1"->"3.1.1",
-        "2"->single(
+        "2"->filterSingle(
           "1" relevantWhen("subj1" is "value1"),
           "2" relevantWhen("subj2" is "value2"),
           "3" relevantWhen("subj2" isNot "value2")
         )(true),
-        "3"->single(
+        "3"->filterSingle(
           "1" relevantWhen("subj1" isNot "value1")
         )(true)
       ),
       "2"-> Map(
-        "1" -> array(
+        "1" -> filterArray(
           "1" relevantWhen("subj1" is "value1"),
           "2" relevantWhen("subj2" is "value2"),
           "3" relevantWhen("subj1" is "value2"),
@@ -38,9 +38,14 @@ class SyncInMemoryAPITests extends WordSpecLike with Matchers with ScalaCodeData
         )(1)
       )
     ),
-    "4"->single(
+    "4"->filterSingle(
       "1".setAs.defaultValue.withRules(("subj1" is "value1" and "subj2".isNot("oo")) or("ss" is 22)),
-      "2".setAs.defaultValue.withRules(("subj1" is "value1" and "subj2".is("oo")) or("ss" is 22))
+      "2".withRules(("subj1" is "value1" and "subj2".is("oo")) or("ss" isNot 22))
+    )(true),
+    "5"->filterSingle(
+      "1".setAs.defaultValue.withRules(("subj1" is "value1" and "subj2".isNot("oo")) or("ss" is 22)),
+      "2".withRules(("subj1" is "value1" and "subj2".is("oo")) or("ss" isNot 22)),
+      "3".withRules(("subj1" is "value1" and "subj2".isNot("oo")) or(("ss" is 22) and ("subj3" is 34)))
     )(true)
   ))
   val api = new SyncInMemoryAPI(simpleIndex,new RecursiveQueryHandler())
@@ -76,6 +81,21 @@ class SyncInMemoryAPITests extends WordSpecLike with Matchers with ScalaCodeData
 
       val res3 = Await.result(api.get("3.2.1",QueryContext("subj2" -> "value2")), 1 second)
       res3 should be (Array("1","2","3","4","5"))
+    }
+    "complex and or combination" in {
+      Await.result(api.get("4",QueryContext("subj1" -> "value1", "subj2"->"some-value", "ss"->23)), 1 second) should be ("1")
+      Await.result(api.get("4",QueryContext("subj1" -> "value1", "subj2"->"oo")), 1 second) should be ("2")
+      Await.result(api.get("4",QueryContext("ss"->22)), 1 second) should be ("1")
+      Await.result(api.get("4",QueryContext("ss"->2)), 1 second) should be ("2")
+      Await.result(api.get("4",QueryContext("subj1" -> "value1", "subj2"->"aa", "subj3"->34)), 1 second) should be ("1")
+    }
+    "complex and or combination - 2" in {
+      val api1 = new SyncInMemoryAPI(new SimpleMapDataIndex(Map(
+        "1" -> filterSingle(
+          "1".withRules(("subj1" is "value1" and "subj2".isNot("oo") and "subj3".greaterThan(33)) or("ss" is 22))
+        )(true)
+      )),new RecursiveQueryHandler())
+      Await.result(api1.get("1",QueryContext("subj1" -> "value1", "subj2"->"aa", "subj3"->34)), 1 second) should be ("1")
     }
   }
 }

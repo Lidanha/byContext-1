@@ -15,22 +15,24 @@ abstract class NumberRule[T  <% Double](val subj:String, val v:T)(implicit tag:T
   protected def operator(contextValue:T, value:T):Boolean
 }
 
-class NumberEquals[T  <% Double](private val subject:String, private val value:T)(implicit tag:TypeTag[T]) extends NumberRule[T](subject, value) {
+case class NumberEquals[T  <% Double](private val subject:String, private val value:T)(implicit tag:TypeTag[T]) extends NumberRule[T](subject, value) {
   override protected def operator(contextValue: T, value: T): Boolean = contextValue == value
 }
 
-class NumberGreaterThan[T  <% Double](private val subject:String, private val value:T)(implicit tag:TypeTag[T]) extends NumberRule[T](subject, value) {
-  override protected def operator(contextValue: T, value: T): Boolean = contextValue > value
+case class NumberGreaterThan[T  <% Double](private val subject:String, private val value:T)(implicit tag:TypeTag[T]) extends NumberRule[T](subject, value) {
+  override protected def operator(contextValue: T, value: T): Boolean = {
+    contextValue > value
+  }
 }
 
-class NumberGreaterThanOrEquals[T  <% Double](private val subject:String, private val value:T)(implicit tag:TypeTag[T]) extends NumberRule[T](subject, value) {
+case class NumberGreaterThanOrEquals[T  <% Double](private val subject:String, private val value:T)(implicit tag:TypeTag[T]) extends NumberRule[T](subject, value) {
   override protected def operator(contextValue: T, value: T): Boolean = contextValue >= value
 }
 
-class NumberSmallerThan[T  <% Double](private val subject:String, private val value:T)(implicit tag:TypeTag[T]) extends NumberRule[T](subject, value) {
+case class NumberSmallerThan[T  <% Double](private val subject:String, private val value:T)(implicit tag:TypeTag[T]) extends NumberRule[T](subject, value) {
   override protected def operator(contextValue: T, value: T): Boolean = contextValue < value
 }
 
-class NumberSmallerThanOrEquals[T  <% Double](private val subject:String, private val value:T)(implicit tag:TypeTag[T]) extends NumberRule[T](subject, value) {
+case class NumberSmallerThanOrEquals[T  <% Double](private val subject:String, private val value:T)(implicit tag:TypeTag[T]) extends NumberRule[T](subject, value) {
   override protected def operator(contextValue: T, value: T): Boolean = contextValue <= value
 }
