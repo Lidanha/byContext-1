@@ -73,10 +73,12 @@ class ScoreCalculatorTests extends WordSpecLike with Matchers with RulesTestsHel
     "and or" in {
       val rule =
         OrRuleContainer(
-        AndRuleContainer(TextMatch("subj1"->"value1"),NotRuleContainer(TextMatch("subj2"->"oo"))),
-        TextMatch("ss"->"22"))
+          AndRuleContainer(TextMatch("subj1"->"value1"),NotRuleContainer(TextMatch("subj2"->"oo"))),
+          TextMatch("ss"->"22")
+        )
 
       val probe = mock[Probe]
+      (probe setRelevancy _).expects(Neutral).twice()
       (probe setRelevancy _).expects(Relevant).once()
 
       rule.evaluate(QueryContext("ss"->"22"),probe)

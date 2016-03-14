@@ -7,9 +7,9 @@ class DefaultScoreCalculator extends ScoreCalculator with StrictLogging{
   override def calculate(ctx: QueryContext, possibleValues:Array[PossibleValue]): Array[ValueWithScore] = {
     possibleValues
       .map{
-        case v@PossibleValue(_, Some(rule),_) =>
+        case v@PossibleValue(_, ruleOpt,_) =>
           val probe = new ProbeImpl()
-          rule.evaluate(ctx,probe)
+          ruleOpt.map(_.evaluate(ctx,probe))
           (v,probe)
       }
       .collect {

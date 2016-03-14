@@ -11,16 +11,18 @@ trait RulesTestsHelper {
     override def evaluate(ctx: QueryContext,probe:Probe): Unit = probe setRelevancy Relevant
   }
   val notRelevant = new AnyRef with FilterRule {
-    override def evaluate(ctx: QueryContext,probe:Probe): Unit = probe setRelevancy NotRelevant
+    override def evaluate(ctx: QueryContext,probe:Probe): Unit = {
+      probe setRelevancy NotRelevant
+    }
   }
   val neutral = new AnyRef with FilterRule {
     override def evaluate(ctx: QueryContext,probe:Probe): Unit = probe setRelevancy Neutral
   }
 
-  def probeThatExpects(r:ValueRelevancy) = {
-    val probe = mock[Probe]
-    (probe setRelevancy _).expects(Relevant).once()
-
+/*  def probeThatExpects(r:ValueRelevancy,mockConfigurator:CallHandler1[ValueRelevancy, Unit]=>Unit = {p=>p.once()}) = {
+    val probe: Probe = mock[Probe]
+    val probeSettings: CallHandler1[ValueRelevancy, Unit] = (probe setRelevancy _).expects(r)
+    mockConfigurator(probeSettings)
     probe
-  }
+  }*/
 }
