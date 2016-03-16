@@ -1,19 +1,19 @@
 package valueContainers
 
-import byContext.{PossibleValueSettings, MinimumResultItemsCountError, PossibleValue, QueryContext}
+import _root_.rules.ContextHelper
+import byContext._
 import byContext.score.valueContainers.DefaultArrayValueContainer
 import byContext.score._
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.{EitherValues, Matchers, WordSpecLike}
 
-class DefaultArrayValueContainerTests extends WordSpecLike with Matchers with EitherValues with MockFactory{
-  val emptyctx = QueryContext()
+class DefaultArrayValueContainerTests extends WordSpecLike with Matchers with EitherValues with MockFactory with ContextHelper{
   val emptyValues = Array.empty[PossibleValue]
 
   def calc(values: Array[Any]): ScoreCalculator = {
     val calculator = stub[ScoreCalculator]
     (calculator.calculate _)
-      .when(emptyctx, emptyValues)
+      .when(emptyContext, emptyValues)
       .returns(values.map(ValueWithScore(_,1, PossibleValueSettings())))
     calculator
   }
@@ -23,13 +23,13 @@ class DefaultArrayValueContainerTests extends WordSpecLike with Matchers with Ei
 
   "DefaultArrayValueContainer" must {
     "return Left(MinimumResultItemsCountError) when score calculator returns less items than the minimum num configured" in {
-      arr(Array.empty[Any])(1).get(emptyctx).left.value shouldBe a[MinimumResultItemsCountError]
+      arr(Array.empty[Any])(1).get(emptyContext).left.value shouldBe a[MinimumResultItemsCountError]
     }
     "return a right with an array with the provided values - a single value" in {
-      arr(Array(""))(1).get(emptyctx).right.value should be (Array(""))
+      arr(Array(""))(1).get(emptyContext).right.value should be (Array(""))
     }
     "return a right with an array with the provided values - multiple values" in {
-      arr(Array(1,2))(1).get(emptyctx).right.value should be (Array(1,2))
+      arr(Array(1,2))(1).get(emptyContext).right.value should be (Array(1,2))
     }
   }
 }

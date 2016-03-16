@@ -5,15 +5,15 @@ object TextMatch{
   def apply(subjectAndValue:(String,String), caseSensitive:Boolean = false) : TextMatch =
     new TextMatch(subjectAndValue._1, subjectAndValue._2, caseSensitive)
 }
-case class TextMatch(val subject:String, val value:String, caseSensitive:Boolean) extends FilterRule with VerifyType{
+case class TextMatch(val subject:String, val value:String, caseSensitive:Boolean) extends FilterRule {
   override def evaluate(ctx: QueryContext, probe: Probe): Unit = {
-    val valueRelevancy = ctx.get(subject)
+    val valueRelevancy = ctx.getAs[String](subject)
       .fold(ValueRelevancy.Neutral){
-        rawValue=>
+        contextValue =>
           if(caseSensitive){
-            if(rawValue == value) ValueRelevancy.Relevant else ValueRelevancy.NotRelevant
+            if(contextValue == value) ValueRelevancy.Relevant else ValueRelevancy.NotRelevant
           }else{
-            verify[String](rawValue, v=>if(v.toLowerCase == value.toLowerCase) ValueRelevancy.Relevant else ValueRelevancy.NotRelevant)
+            if(contextValue.toLowerCase == value.toLowerCase) ValueRelevancy.Relevant else ValueRelevancy.NotRelevant
           }
       }
     probe setRelevancy valueRelevancy

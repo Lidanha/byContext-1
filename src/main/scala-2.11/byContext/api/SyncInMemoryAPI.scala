@@ -8,14 +8,12 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class SyncInMemoryAPI(index:DataIndex, queryHandler: QueryHandler) extends ByContextAPI with StrictLogging{
 
-  override def get(path: String, ctx: QueryContext): Future[Any] = {
+  override def get(path: String, ctx: QueryBuilder)(implicit ec:ExecutionContext): Future[Any] = {
     val f = index.getItem(path) match {
       case None => Future.failed(new RuntimeException(s"path: $path not found"))
       case Some(IndexItem(nodeName, value)) => filter(nodeName, value, ctx)
     }
 
-    //TODO:fix use of global context
-    implicit val exec = ExecutionContext.global
     f.onFailure{
       case t => logger.error(s"failed processing query with context: ${ctx.toString()}",t)
     }

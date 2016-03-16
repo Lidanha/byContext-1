@@ -2,18 +2,8 @@ package byContext
 
 import byContext.ValueRelevancy.ValueRelevancy
 
-case class QueryContext(private val items:(String,Any)*){
-  val map = Map(items:_*)
-  def get(key:String):Option[Any] = map.get(key)
-
-  override def toString() : String = {
-    def formatItems = {
-      items.map{
-        x=>s"${x._1}->${x._2}"
-      }.mkString(" - ")
-    }
-    s"{QueryContext: ${formatItems}"
-  }
+trait QueryContext{
+  def getAs[T](key:String):Option[T]
 }
 
 object ValueRelevancy extends Enumeration{

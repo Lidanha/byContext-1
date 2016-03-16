@@ -1,9 +1,7 @@
 package byContext.api
 
-import byContext.QueryContext
-
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 trait ByContextAPI {
-  def get(path:String, ctx:QueryContext) : Future[Any]
+  def get(path:String, query: QueryBuilder)(implicit ec:ExecutionContext) : Future[Any]
 }

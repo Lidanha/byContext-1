@@ -1,5 +1,6 @@
 package rules
 
+import byContext.api.QueryBuilder
 import byContext.{FilterRule, Probe, QueryContext, ValueRelevancy}
 import org.scalamock.scalatest.MockFactory
 
@@ -16,4 +17,9 @@ trait RulesTestsHelper {
   val neutral = new AnyRef with FilterRule {
     override def evaluate(ctx: QueryContext,probe:Probe): Unit = probe setRelevancy Neutral
   }
+
+}
+
+trait ContextHelper{
+  val emptyContext = new QueryBuilder()
 }

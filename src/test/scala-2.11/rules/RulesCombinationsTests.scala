@@ -1,15 +1,16 @@
 package rules
 
+import byContext.Probe
 import byContext.ValueRelevancy._
+import byContext.api.QueryBuilder
 import byContext.data.ScalaCodeDataSource
 import byContext.rules._
-import byContext.{Probe, QueryContext}
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.{Matchers, WordSpecLike}
 
 import scala.collection.mutable.ListBuffer
 
-class RulesCombinationsTests extends WordSpecLike with Matchers with RulesTestsHelper with MockFactory{
+class RulesCombinationsTests extends WordSpecLike with Matchers with RulesTestsHelper with MockFactory with ContextHelper{
   "rules combinations" must {
     "or -> and -> simple" in {
       val rule =
@@ -25,7 +26,7 @@ class RulesCombinationsTests extends WordSpecLike with Matchers with RulesTestsH
       (probe setRelevancy _).expects(Neutral).once()
       (probe setRelevancy _).expects(Relevant).twice()
 
-      rule.evaluate(QueryContext(),probe)
+      rule.evaluate(emptyContext,probe)
     }
     "complex" in {
       val rule =
@@ -43,7 +44,7 @@ class RulesCombinationsTests extends WordSpecLike with Matchers with RulesTestsH
       val probe = mock[Probe]
       (probe setRelevancy _).expects(Relevant) repeated 4 times
 
-      rule.evaluate(QueryContext(),probe)
+      rule.evaluate(emptyContext,probe)
     }
     "complex from api tests" in {
       val x= new ScalaCodeDataSource{}
@@ -56,7 +57,7 @@ class RulesCombinationsTests extends WordSpecLike with Matchers with RulesTestsH
       val p = new Probe {
         override def setRelevancy(r: ValueRelevancy): Unit = rels += r
       }
-      rule.evaluate(QueryContext("subj1"->"value1"), p)
+      rule.evaluate(new QueryBuilder{item("subj1"->"value1")}, p)
 
       rels.count(_ == Relevant) should be (1)
     }

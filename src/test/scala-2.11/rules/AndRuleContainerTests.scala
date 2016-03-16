@@ -1,11 +1,12 @@
 package rules
 
+import byContext.api.QueryBuilder
 import byContext.rules.{AndRuleContainer, TextMatch}
-import byContext.{Probe, QueryContext, ValueRelevancy}
+import byContext.{Probe, ValueRelevancy}
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.{Matchers, WordSpecLike}
 
-class AndRuleContainerTests extends WordSpecLike with Matchers with MockFactory with RulesTestsHelper {
+class AndRuleContainerTests extends WordSpecLike with Matchers with MockFactory with RulesTestsHelper with ContextHelper {
   import ValueRelevancy._
   "AndRuleContainer" must {
     "evaluate to NotRelevant when relevant + notRelevant are passed in" in {
@@ -15,9 +16,9 @@ class AndRuleContainerTests extends WordSpecLike with Matchers with MockFactory 
         probe
       }
 
-      new AndRuleContainer(relevant, notRelevant).evaluate(QueryContext("subj1"->"v1"),p)
+      new AndRuleContainer(relevant, notRelevant).evaluate(new QueryBuilder{item("subj1"->"v1")},p)
       new AndRuleContainer(TextMatch("subj1"->"v1"), TextMatch("subj1"->"v2"))
-        .evaluate(QueryContext("subj1"->"v1"),p)
+        .evaluate(new QueryBuilder{item("subj1"->"v1")},p)
     }
     "evaluate to NotRelevant when notRelevant + neutral are passed in" in {
       def p = {
@@ -26,9 +27,9 @@ class AndRuleContainerTests extends WordSpecLike with Matchers with MockFactory 
         probe
       }
 
-      new AndRuleContainer(neutral, notRelevant).evaluate(QueryContext("subj1"->"v1"),p)
+      new AndRuleContainer(neutral, notRelevant).evaluate(new QueryBuilder{item("subj1"->"v1")},p)
       new AndRuleContainer(TextMatch("subj2"->"v1"), TextMatch("subj1"->"v2"))
-        .evaluate(QueryContext("subj1"->"v1"),p)
+        .evaluate(new QueryBuilder{item("subj1"->"v1")},p)
     }
     "evaluate to Relevant when relevant + relevant are passed in" in {
       def p = {
@@ -37,9 +38,9 @@ class AndRuleContainerTests extends WordSpecLike with Matchers with MockFactory 
         probe
       }
 
-      new AndRuleContainer(relevant, relevant).evaluate(QueryContext("subj1"->"v1"),p)
+      new AndRuleContainer(relevant, relevant).evaluate(new QueryBuilder{item("subj1"->"v1")},p)
       new AndRuleContainer(TextMatch("subj1"->"v1"), TextMatch("subj1"->"v1"))
-        .evaluate(QueryContext("subj1"->"v1"),p)
+        .evaluate(new QueryBuilder{item("subj1"->"v1")},p)
     }
     "evaluate to relevant when relevant + neutral are passed in" in {
       def p = {
@@ -49,9 +50,9 @@ class AndRuleContainerTests extends WordSpecLike with Matchers with MockFactory 
         probe
       }
 
-      new AndRuleContainer(relevant, neutral).evaluate(QueryContext("subj1"->"v1"),p)
+      new AndRuleContainer(relevant, neutral).evaluate(new QueryBuilder{item("subj1"->"v1")},p)
       new AndRuleContainer(TextMatch("subj2"->"v1"), TextMatch("subj1"->"v1"))
-        .evaluate(QueryContext("subj1"->"v1"),p)
+        .evaluate(new QueryBuilder{item("subj1"->"v1")},p)
     }
     "evaluate to neutral when neutral + neutral are passed in" in {
       def p = {
@@ -60,9 +61,9 @@ class AndRuleContainerTests extends WordSpecLike with Matchers with MockFactory 
         probe
       }
 
-      new AndRuleContainer(neutral, neutral).evaluate(QueryContext("subj1"->"v1"),p)
+      new AndRuleContainer(neutral, neutral).evaluate(new QueryBuilder{item("subj1"->"v1")},p)
       new AndRuleContainer(TextMatch("subj2"->"v1"), TextMatch("subj2"->"v3"))
-        .evaluate(QueryContext("subj1"->"v1"),p)
+        .evaluate(new QueryBuilder{item("subj1"->"v1")},p)
     }
   }
 }
