@@ -1,30 +1,16 @@
 package byContext.api
 
-import byContext.writers.map._
-import byContext.{DataIndex, IndexItem, QueryContext, QueryHandler}
-import com.typesafe.scalalogging.StrictLogging
+import byContext._
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class SyncInMemoryAPI(index:DataIndex, queryHandler: QueryHandler) extends ByContextAPI with StrictLogging{
-
-  override def get(path: String, ctx: QueryBuilder)(implicit ec:ExecutionContext): Future[Any] = {
-    val f = index.getItem(path) match {
-      case None => Future.failed(new RuntimeException(s"path: $path not found"))
-      case Some(IndexItem(nodeName, value)) => filter(nodeName, value, ctx)
-    }
-
-    f.onFailure{
-      case t => logger.error(s"failed processing query with context: ${ctx.toString()}",t)
-    }
-    f
-  }
-
-  private def filter(nodeName:String, value:Any, ctx: QueryContext) = {
+class SyncInMemoryAPI(dataSetHandler: DataSetHandler) extends ByContextAPI {
+  override def get(path: String, ctx: QueryBuilder)(implicit ec:ExecutionContext): Future[Any] =
+  {
     try {
-      val rootWriter = new MapRootWriterFactory()
-      queryHandler.query(ctx, value,rootWriter)
-      Future.successful(rootWriter.getValue)
+      val value = dataSetHandler.get(path, ctx)
+
+      Future.successful(value)
     }
     catch {
       case t:Throwable => Future.failed(t)

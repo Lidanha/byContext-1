@@ -1,14 +1,14 @@
 package api
 
-import byContext.api.{QueryBuilder, SyncInMemoryAPI}
+import byContext.SimpleMapDataIndex
+import byContext.api.{EmbeddedAPIBuilder, QueryBuilder}
 import byContext.data.ScalaCodeDataSource
 import byContext.score.DefaultScoreCalculator
-import byContext.{RecursiveQueryHandler, SimpleMapDataIndex}
 import org.scalatest.{Matchers, WordSpecLike}
 import rules.ContextHelper
 
-import scala.concurrent.{ExecutionContext, Await}
 import scala.concurrent.duration._
+import scala.concurrent.{Await, ExecutionContext}
 class SyncInMemoryAPITests extends WordSpecLike with Matchers with ScalaCodeDataSource with ContextHelper{
   implicit val scoreCalculator = new DefaultScoreCalculator()
   val simpleIndex = new SimpleMapDataIndex(Map(
@@ -47,11 +47,16 @@ class SyncInMemoryAPITests extends WordSpecLike with Matchers with ScalaCodeData
       "1".setAs.defaultValue.withRules(("subj1" is "value1" and "subj2".isNot("oo")) or("ss" is 22)),
       "2".withRules(("subj1" is "value1" and "subj2".is("oo")) or("ss" isNot 22)),
       "3".withRules(("subj1" is "value1" and "subj2".isNot("oo")) or(("ss" is 22) and ("subj3" is 34)))
-    )(true)
+    )(true),
+    "6" -> filterSingle(
+      "1" withRules(("subj1" is "value1" and "subjNum".smallerThanOrEquals(10)) or("subj1" is "value2" and "subjNum".smallerThanOrEquals(7))),
+      "2".setAs.defaultValue
+    )(true),
+    "ref"->valueRef("3.2.1")
   ))
   implicit val ec = ExecutionContext.global
 
-  val api = new SyncInMemoryAPI(simpleIndex,new RecursiveQueryHandler())
+  val api = EmbeddedAPIBuilder(simpleIndex)
   "SyncInMemoryAPI with RecursiveQueryHandler" must {
     "return simple raw value a couple of levels deep" in {
 
@@ -114,16 +119,30 @@ class SyncInMemoryAPITests extends WordSpecLike with Matchers with ScalaCodeData
       }), 1 second) should be ("1")
     }
     "complex and or combination - 2" in {
-      val api1 = new SyncInMemoryAPI(new SimpleMapDataIndex(Map(
+      val api1 = EmbeddedAPIBuilder((new SimpleMapDataIndex(Map(
         "1" -> filterSingle(
           "1".withRules(("subj1" is "value1" and "subj2".isNot("oo") and "subj3".greaterThan(33)) or("ss" is 22))
         )(true)
-      )),new RecursiveQueryHandler())
+      ))))
       Await.result(api1.get("1",new QueryBuilder{
         item("subj1" -> "value1")
         item("subj2"->"aa")
         item("subj3"->34)
       }), 1 second) should be ("1")
     }
+    "(text match and number smaller than or equals) or (text match and number smaller than or equals)" in {
+      Await.result(api.get("4",new QueryBuilder{
+        item("subj1"->"value1")
+        item("subjNum"->7)
+      }), 1 second) should be ("1")
+    }
+    "value ref" in {
+      val res = Await.result(api.get("ref",new QueryBuilder{
+        item("subj1" -> "value1")
+        item("subj2" -> "some_val")
+      }), 1 second)
+      res should be (Array("1","4"))
+    }
+
   }
 }

@@ -1,9 +1,10 @@
 package byContext.api
 
-import byContext.{DataIndex, RecursiveQueryHandler}
+import byContext.{InMemoryDataSetHandler, DataIndex, RecursiveQueryHandler}
 
 object EmbeddedAPIBuilder {
   def apply(index:DataIndex):ByContextAPI = {
-    new SyncInMemoryAPI(index,new RecursiveQueryHandler())
+    val dataSetHandler = new InMemoryDataSetHandler(index,new RecursiveQueryHandler())
+    new SyncInMemoryAPI(dataSetHandler)
   }
 }

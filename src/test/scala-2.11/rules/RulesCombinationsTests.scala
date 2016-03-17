@@ -61,5 +61,24 @@ class RulesCombinationsTests extends WordSpecLike with Matchers with RulesTestsH
 
       rels.count(_ == Relevant) should be (1)
     }
+    "(text match and number smaller than or equals) or (text match and number smaller than or equals)" in {
+      val x= new ScalaCodeDataSource{}
+      import x._
+
+      val rule = ("subj1" is "value1" and "subjNum".smallerThanOrEquals(10)) or("subj1" is "value2" and "subjNum".smallerThanOrEquals(7))
+
+      val rels = ListBuffer[ValueRelevancy]()
+
+      val p = new Probe {
+        override def setRelevancy(r: ValueRelevancy): Unit = rels += r
+      }
+      rule.evaluate(new QueryBuilder{
+        item("subj1"->"value1")
+        item("subjNum"->9)
+      }, p)
+
+      rels.size should be (2)
+      rels.count(_ == Relevant) should be (2)
+    }
   }
 }

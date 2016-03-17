@@ -4,6 +4,7 @@ import byContext.rules._
 import byContext.score.ScoreCalculator
 import byContext.score.valueContainers.{ArrayValueContainer, DefaultArrayValueContainer, DefaultSingleValueContainer, SingleValueContainer}
 import byContext._
+import byContext.valueContainers.ValueRefContainer
 
 trait Filters{
   def filterArray(values: PossibleValue*)(minItemsCount: Int = 1)(implicit calc: ScoreCalculator): ArrayValueContainer =
@@ -15,6 +16,12 @@ trait Filters{
   def filterSingle(values: PossibleValue*)(isRequired: Boolean = true)(implicit calc: ScoreCalculator): SingleValueContainer =
     new DefaultSingleValueContainer(calc, values.toArray,
       new CompositeDefaultValueSelector(Seq(new HighestScoreDefaultValueSelector(),new DefaultMarkedDefaultValueSelector())), isRequired)
+  def valueRef(path:String):ValueRefContainer = new ValueRefContainer with Extenstion{
+    var dataSetHandler: DataSetHandler = _
+
+    override def init(handler: DataSetHandler): Unit = this.dataSetHandler = handler
+    override def get(queryContext: QueryContext): Any = dataSetHandler.get(path,queryContext)
+  }
 }
 
 trait RulesBuilders{
@@ -32,6 +39,8 @@ trait RulesBuilders{
     def is(value: Double) = new NumberEquals(subject, value)
     def isNot(value: Double) = new NotRuleContainer(new NumberEquals(subject, value))
     def greaterThan(value: Double) = new NumberGreaterThan(subject,value)
+    def smallerThanOrEquals(value: Double) = new NumberSmallerThanOrEquals(subject,value)
+    def greaterThanOrEquals(value: Double) = new NumberGreaterThanOrEquals(subject,value)
   }
   implicit def rulesConnector(leftRule:FilterRule) = new {
     def and(rightRule:FilterRule) : FilterRule = new AndRuleContainer(leftRule,rightRule)
@@ -40,22 +49,36 @@ trait RulesBuilders{
 }
 trait ScalaCodeDataSource extends Filters with RulesBuilders{
 
-  implicit def possibleValueBuilder(subject:String) = new PossibleValueBuilder(subject)
+  implicit def possibleValueBuilder(value:Any) = new PossibleValueBuilder(value)
 
   trait PossibleValueSettingsBuilder extends WithRules{
     def defaultValue : PossibleValueSettingsBuilder
+    private[data] def buildPossibleValue : PossibleValue
   }
   trait WithRules{
-    def withRules(rule:FilterRule) : PossibleValue
+    def withRules(rule:FilterRule) : PossibleValueSettingsBuilder
   }
-  class PossibleValueBuilder(val value:String) extends PossibleValueSettingsBuilder {
+
+  implicit def possibleValueExtractor(builder:PossibleValueSettingsBuilder) : PossibleValue = builder.buildPossibleValue
+
+
+  class PossibleValueBuilder(val value:Any) extends PossibleValueSettingsBuilder {
     var isDefault = false
+    var rule:Option[FilterRule] = None
     def setAs : PossibleValueSettingsBuilder = this
 
     override def defaultValue: PossibleValueSettingsBuilder = {
       isDefault = true
       this
     }
-    override def withRules(rule:FilterRule) : PossibleValue = PossibleValue(value,Some(rule), PossibleValueSettings(isDefault = this.isDefault))
+
+    override def withRules(r:FilterRule) : PossibleValueSettingsBuilder = {
+      rule = Some(r)
+      this
+    }
+
+    /*override def withRules(rule:FilterRule) : PossibleValue =
+      PossibleValue(value,Some(rule), PossibleValueSettings(isDefault = this.isDefault))*/
+    override def buildPossibleValue: PossibleValue = PossibleValue(value,rule, PossibleValueSettings(isDefault = this.isDefault))
   }
 }
