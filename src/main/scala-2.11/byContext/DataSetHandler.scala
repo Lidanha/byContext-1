@@ -6,7 +6,10 @@ import com.typesafe.scalalogging.StrictLogging
 trait DataSetHandler {
   def get(path:String, queryContext: QueryContext) : Any
 }
-class InMemoryDataSetHandler(index:DataIndex, queryHandler: QueryHandler) extends DataSetHandler with StrictLogging{
+class InMemoryDataSetHandler(queryHandler: QueryHandler) extends DataSetHandler with StrictLogging{
+  var index:DataIndex = _
+  def loadIndex(idx:DataIndex) = index = idx
+
   override def get(path: String, queryContext: QueryContext): Any = {
     index.getItem(path) match {
         //TODO:change to return either[] instead of throwing an exception

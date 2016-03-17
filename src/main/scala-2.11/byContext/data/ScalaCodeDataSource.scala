@@ -4,7 +4,7 @@ import byContext.rules._
 import byContext.score.ScoreCalculator
 import byContext.score.valueContainers.{ArrayValueContainer, DefaultArrayValueContainer, DefaultSingleValueContainer, SingleValueContainer}
 import byContext._
-import byContext.valueContainers.ValueRefContainer
+import byContext.valueContainers.{UnsafeValueRefContainer, ValueRefContainer}
 
 trait Filters{
   def filterArray(values: PossibleValue*)(minItemsCount: Int = 1)(implicit calc: ScoreCalculator): ArrayValueContainer =
@@ -16,12 +16,7 @@ trait Filters{
   def filterSingle(values: PossibleValue*)(isRequired: Boolean = true)(implicit calc: ScoreCalculator): SingleValueContainer =
     new DefaultSingleValueContainer(calc, values.toArray,
       new CompositeDefaultValueSelector(Seq(new HighestScoreDefaultValueSelector(),new DefaultMarkedDefaultValueSelector())), isRequired)
-  def valueRef(path:String):ValueRefContainer = new ValueRefContainer with Extenstion{
-    var dataSetHandler: DataSetHandler = _
-
-    override def init(handler: DataSetHandler): Unit = this.dataSetHandler = handler
-    override def get(queryContext: QueryContext): Any = dataSetHandler.get(path,queryContext)
-  }
+  def valueRef(path:String):ValueRefContainer = new UnsafeValueRefContainer(path)
 }
 
 trait RulesBuilders{

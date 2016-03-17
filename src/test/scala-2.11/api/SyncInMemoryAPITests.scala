@@ -1,17 +1,16 @@
 package api
 
-import byContext.SimpleMapDataIndex
 import byContext.api.{EmbeddedAPIBuilder, QueryBuilder}
 import byContext.data.ScalaCodeDataSource
 import byContext.score.DefaultScoreCalculator
 import org.scalatest.{Matchers, WordSpecLike}
-import rules.ContextHelper
+import rules.{ContextHelper, WireupHelpers}
 
 import scala.concurrent.duration._
 import scala.concurrent.{Await, ExecutionContext}
-class SyncInMemoryAPITests extends WordSpecLike with Matchers with ScalaCodeDataSource with ContextHelper{
+class SyncInMemoryAPITests extends WordSpecLike with Matchers with ScalaCodeDataSource with ContextHelper with WireupHelpers{
   implicit val scoreCalculator = new DefaultScoreCalculator()
-  val simpleIndex = new SimpleMapDataIndex(Map(
+  val simpleIndex = Map(
     "1"->"1",
     "2"->Map(
       "1"->"2.1",
@@ -53,7 +52,7 @@ class SyncInMemoryAPITests extends WordSpecLike with Matchers with ScalaCodeData
       "2".setAs.defaultValue
     )(true),
     "ref"->valueRef("3.2.1")
-  ))
+  )
   implicit val ec = ExecutionContext.global
 
   val api = EmbeddedAPIBuilder(simpleIndex)
@@ -119,11 +118,11 @@ class SyncInMemoryAPITests extends WordSpecLike with Matchers with ScalaCodeData
       }), 1 second) should be ("1")
     }
     "complex and or combination - 2" in {
-      val api1 = EmbeddedAPIBuilder((new SimpleMapDataIndex(Map(
+      val api1 = EmbeddedAPIBuilder(Map(
         "1" -> filterSingle(
           "1".withRules(("subj1" is "value1" and "subj2".isNot("oo") and "subj3".greaterThan(33)) or("ss" is 22))
         )(true)
-      ))))
+      ))
       Await.result(api1.get("1",new QueryBuilder{
         item("subj1" -> "value1")
         item("subj2"->"aa")
