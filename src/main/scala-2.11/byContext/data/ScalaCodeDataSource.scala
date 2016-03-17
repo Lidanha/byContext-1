@@ -4,7 +4,7 @@ import byContext.rules._
 import byContext.score.ScoreCalculator
 import byContext.score.valueContainers.{ArrayValueContainer, DefaultArrayValueContainer, DefaultSingleValueContainer, SingleValueContainer}
 import byContext._
-import byContext.valueContainers.{UnsafeValueRefContainer, ValueRefContainer}
+import byContext.valueContainers.{Substitute, InterpolatedStringValueContainer, UnsafeValueRefContainer, ValueRefContainer}
 
 trait Filters{
   def filterArray(values: PossibleValue*)(minItemsCount: Int = 1)(implicit calc: ScoreCalculator): ArrayValueContainer =
@@ -17,6 +17,10 @@ trait Filters{
     new DefaultSingleValueContainer(calc, values.toArray,
       new CompositeDefaultValueSelector(Seq(new HighestScoreDefaultValueSelector(),new DefaultMarkedDefaultValueSelector())), isRequired)
   def valueRef(path:String):ValueRefContainer = new UnsafeValueRefContainer(path)
+  def interpolated(value:String,substitutes: Seq[(String,String)]) : SingleValueContainer= {
+    val subs = substitutes.map(x=>Substitute(x._1,x._2))
+    new InterpolatedStringValueContainer(value,subs)
+  }
 }
 
 trait RulesBuilders{

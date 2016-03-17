@@ -51,7 +51,8 @@ class SyncInMemoryAPITests extends WordSpecLike with Matchers with ScalaCodeData
       "1" withRules(("subj1" is "value1" and "subjNum".smallerThanOrEquals(10)) or("subj1" is "value2" and "subjNum".smallerThanOrEquals(7))),
       "2".setAs.defaultValue
     )(true),
-    "ref"->valueRef("3.2.1")
+    "ref"->valueRef("3.2.1"),
+    "stringInterpolation" -> interpolated("test interpolated [[key]] !!!",Seq("key"->"2.1"))
   )
   implicit val ec = ExecutionContext.global
 
@@ -142,6 +143,9 @@ class SyncInMemoryAPITests extends WordSpecLike with Matchers with ScalaCodeData
       }), 1 second)
       res should be (Array("1","4"))
     }
-
+    "string interpolation" in {
+      val res = Await.result(api.get("stringInterpolation",new QueryBuilder()), 1 second)
+      res should be ("test interpolated 2.1 !!!")
+    }
   }
 }

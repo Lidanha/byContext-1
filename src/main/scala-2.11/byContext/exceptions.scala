@@ -16,3 +16,5 @@ case class EmptyValuesWithScoreProvidedError() extends DefaultValueSelectorError
 
 case class RequiredValueMissingError() extends ByContextError
 case class MinimumResultItemsCountError() extends ByContextError
+
+case class StringInterpolationFailed(msg:String) extends ByContextError

@@ -28,7 +28,7 @@ trait WireupHelpers{
   def toIndex (data:Map[String,Any]) : DataIndex = {
     val indexBuilder = new IndexBuilderInspector()
     val dataSetVisitor = new DataSetVisitor()
-    dataSetVisitor.visit(data, Seq(indexBuilder))
+    dataSetVisitor.visit(data, inspectors = Seq(indexBuilder))
     new MapDataIndex(indexBuilder.getIndex)
   }
 }

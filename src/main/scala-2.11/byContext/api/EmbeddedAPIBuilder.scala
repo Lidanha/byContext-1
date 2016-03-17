@@ -8,8 +8,9 @@ object EmbeddedAPIBuilder {
 
     val indexBuilder = new IndexBuilderInspector()
     val dataSetHandler = new InMemoryDataSetHandler(new RecursiveQueryHandler())
-    val dataSetVisitor = new DataSetVisitor()
-    dataSetVisitor.visit(data, Seq(indexBuilder, new ExtensionsInitializerExtension(dataSetHandler)))
+
+    new DataSetVisitor().visit(data, inspectors = Seq(indexBuilder, new ExtensionsInitializerExtension(dataSetHandler)))
+
     dataSetHandler.loadIndex(new MapDataIndex(indexBuilder.getIndex))
     new SyncInMemoryAPI(dataSetHandler)
   }
