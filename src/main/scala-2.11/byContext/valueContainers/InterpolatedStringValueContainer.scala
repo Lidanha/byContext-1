@@ -2,13 +2,14 @@ package byContext.valueContainers
 
 import byContext._
 import byContext.score.valueContainers.SingleValueContainer
+import com.typesafe.scalalogging.StrictLogging
 
 import scala.util.{Failure, Success, Try}
 
-case class Substitute(key:String, path:String)
+case class Substitute(stringToReplace:String, path:String)
 
 class InterpolatedStringValueContainer(value:String, substitutes:Seq[Substitute])
-  extends SingleValueContainer with Extenstion{
+  extends SingleValueContainer with Extenstion with StrictLogging{
 
   var dataSetHandler: DataSetHandler = _
 
@@ -22,17 +23,24 @@ class InterpolatedStringValueContainer(value:String, substitutes:Seq[Substitute]
   }
 
   def interpolate(ctx: QueryContext): String = {
+    logger.debug(s"iterating substitutes for value: $value")
     substitutes
       .map { sub =>
+        logger.debug(s"finding path ${sub.path} to interpolate in value: ${value}")
         dataSetHandler.get(sub.path, ctx) match {
-          case v: String => (sub.key, v)
-          case unsupported => throw new scala.RuntimeException(s"un supported interpolated value: ${unsupported.toString}")
+          case v: String =>
+            logger.debug(s"found value ${v} for path ${sub.path} to interpolate in value: ${value}")
+            (sub, v)
+          case unsupported =>
+            logger.warn(s"found unsupported value for interpolation: ${unsupported.toString}, throwing exception")
+            throw new scala.RuntimeException(s"un supported interpolated value: ${unsupported.toString}")
         }
       }
       .foldLeft(value) {
         (current, kv) =>
-          val (key, newValue) = kv
-          current.replace(s"[[${key}]]", newValue)
+          val (sub, newValue) = kv
+          logger.debug(s"replacing ${sub.stringToReplace} with $newValue")
+          current.replace(s"${sub.stringToReplace}", newValue)
       }
   }
 

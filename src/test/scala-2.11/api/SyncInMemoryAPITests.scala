@@ -14,7 +14,13 @@ class SyncInMemoryAPITests extends WordSpecLike with Matchers with ScalaCodeData
     "1"->"1",
     "2"->Map(
       "1"->"2.1",
-      "2"->"2.2"
+      "2"->"2.2",
+      "3"->"to be interpolated",
+      "4"->filterSingle(
+        "inter1"  relevantWhen("subj1" is "v1"),
+        "inter2"  relevantWhen("subj1" is "v2"),
+        ""        relevantWhen("sub1" is "v3")
+      )(true)
     ),
     "3"->Map(
       "1"->Map(
@@ -52,7 +58,8 @@ class SyncInMemoryAPITests extends WordSpecLike with Matchers with ScalaCodeData
       "2".setAs.defaultValue
     )(true),
     "ref"->valueRef("3.2.1"),
-    "stringInterpolation" -> interpolated("test interpolated [[key]] !!!",Seq("key"->"2.1"))
+    "stringInterpolation" -> interpolated("test interpolated <<2.3>> !!!"),
+    "stringInterpolation_filtered" -> interpolated("test interpolated <<2.4>> !!!")
   )
   implicit val ec = ExecutionContext.global
 
@@ -145,7 +152,19 @@ class SyncInMemoryAPITests extends WordSpecLike with Matchers with ScalaCodeData
     }
     "string interpolation" in {
       val res = Await.result(api.get("stringInterpolation",new QueryBuilder()), 1 second)
-      res should be ("test interpolated 2.1 !!!")
+      res should be ("test interpolated to be interpolated !!!")
+    }
+    "string interpolation with interpolated value filtered" in {
+      val res = Await.result(api.get("stringInterpolation_filtered",new QueryBuilder{
+        item("subj1"->"v1")
+      }), 1 second)
+      res should be ("test interpolated inter1 !!!")
+    }
+    "string interpolation with empty and filtered interpolated value" in {
+      val res = Await.result(api.get("stringInterpolation_filtered",new QueryBuilder{
+        item("subj1"->"v3")
+      }), 1 second)
+      res should be ("test interpolated  !!!")
     }
   }
 }
