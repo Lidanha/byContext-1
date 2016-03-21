@@ -9,7 +9,7 @@ import scala.util.{Failure, Success, Try}
 case class Substitute(stringToReplace:String, path:String)
 
 class InterpolatedStringValueContainer(value:String, substitutes:Seq[Substitute])
-  extends SingleValueContainer with Extenstion with StrictLogging{
+  extends SingleValueContainer with DataSetHandlerExtension with StrictLogging{
 
   var dataSetHandler: DataSetHandler = _
 
