@@ -4,7 +4,7 @@ import byContext._
 import byContext.rules._
 import byContext.score.ScoreCalculator
 import byContext.score.valueContainers.{ArrayValueContainer, DefaultArrayValueContainer, DefaultSingleValueContainer, SingleValueContainer}
-import byContext.valueContainers.{InterpolatedStringValueContainer, Substitute, UnsafeValueRefContainer, ValueRefContainer}
+import byContext.valueContainers.{InterpolatedStringValueMarker, ValueRefMarker}
 
 trait Filters{
   def filterArray(values: PossibleValue*)(minItemsCount: Int = 1)(implicit calc: ScoreCalculator): ArrayValueContainer =
@@ -16,19 +16,11 @@ trait Filters{
   def filterSingle(values: PossibleValue*)(isRequired: Boolean = true)(implicit calc: ScoreCalculator): SingleValueContainer =
     new DefaultSingleValueContainer(calc, values.toArray,
       new CompositeDefaultValueSelector(Seq(new HighestScoreDefaultValueSelector(),new DefaultMarkedDefaultValueSelector())), isRequired)
-  def valueRef(path:String):ValueRefContainer = new UnsafeValueRefContainer(path)
-  def interpolated(value:String) : SingleValueContainer= {
-    val re = """<<.*>>""".r
-    val subs = re
-      .findAllMatchIn(value)
-      .map{m=>
-        val path = m.source.subSequence(m.start+2,m.end-2).toString
-        val stringToReplace = m.source.subSequence(m.start,m.end).toString
-        Substitute(stringToReplace,path)
-      }
-      .toSeq
-
-    new InterpolatedStringValueContainer(value,subs)
+  def valueRef(p:String):ValueRefMarker = new ValueRefMarker{
+    override val path: String = p
+  }
+  def interpolated(v:String) = new InterpolatedStringValueMarker {
+    override val value: String = v
   }
 }
 

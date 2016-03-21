@@ -1,7 +1,6 @@
 package byContext
 
 import byContext.score.valueContainers.{ArrayValueContainer, ObjectValueContainer, SingleValueContainer}
-import byContext.valueContainers.ValueRefContainer
 import byContext.writers.Writer
 import com.typesafe.scalalogging.StrictLogging
 
@@ -18,13 +17,8 @@ class RecursiveQueryHandler extends QueryHandler with StrictLogging{
       case container:SingleValueContainer => handleSingleValueContainer(writer, container)
       case container:ArrayValueContainer => handleArrayValueContainer(container,writer)
       case container:ObjectValueContainer => handleObjectValueContainer(container,writer)
-      case container:ValueRefContainer => handleValueRefContainer(container,writer)
       case raw => writer.write(raw)
     }
-  }
-
-  private def handleValueRefContainer(container: ValueRefContainer, writer: Writer)(implicit ctx:QueryContext) : Unit = {
-    process(container.get(ctx),writer)
   }
 
   private def handleRawObject(writer: Writer, obj: Map[String, Any])(implicit ctx:QueryContext) : Unit = {

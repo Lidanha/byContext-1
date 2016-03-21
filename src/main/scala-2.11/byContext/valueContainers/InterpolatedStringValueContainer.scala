@@ -3,15 +3,45 @@ package byContext.valueContainers
 import byContext._
 import byContext.score.valueContainers.SingleValueContainer
 import com.typesafe.scalalogging.StrictLogging
-
 import scala.util.{Failure, Success, Try}
 
-case class Substitute(stringToReplace:String, path:String)
+case class Substitute(stringToReplace:String, container:SingleValueContainer)
+class InterpolatedStringValueMarkerConverter(data:Map[String,Any]) extends DataSetItemConverter with MapExtensions with StrictLogging{
+  val re = """<<.*>>""".r
 
+  override def convert: PartialFunction[DataSetItem, Any] = {
+    case DataSetItem(_,_,marker:InterpolatedStringValueMarker) =>
+
+      val subs = buildSubsitutes(marker)
+      new InterpolatedStringValueContainer(marker.value, subs)
+  }
+
+  private def buildSubsitutes(marker: InterpolatedStringValueMarker): Seq[Substitute] = {
+    re
+      .findAllMatchIn(marker.value)
+      .map { m =>
+        val path = m.source.subSequence(m.start + 2, m.end - 2).toString
+        val stringToReplace = m.source.subSequence(m.start, m.end).toString
+        Substitute(stringToReplace, findContainer(path))
+      }
+      .toSeq
+  }
+  private def findContainer(path:String):SingleValueContainer = {
+    data.findByPath(path) match {
+      case container:SingleValueContainer=>container
+      case value:String => new SingleValueContainer {
+        override def get(ctx: QueryContext): Either[ByContextError, Any] = Right(value)
+      }
+      case notsupported =>
+        throw new RuntimeException(s"unsupported ref for string interpolation: ${notsupported} only ${classOf[SingleValueContainer].getName} is supported")
+    }
+  }
+}
+trait InterpolatedStringValueMarker{
+  val value:String
+}
 class InterpolatedStringValueContainer(value:String, substitutes:Seq[Substitute])
-  extends SingleValueContainer with DataSetHandlerExtension with StrictLogging{
-
-  var dataSetHandler: DataSetHandler = _
+  extends SingleValueContainer with StrictLogging{
 
   override def get(ctx: QueryContext): Either[ByContextError, Any] = {
     Try{
@@ -24,12 +54,11 @@ class InterpolatedStringValueContainer(value:String, substitutes:Seq[Substitute]
 
   def interpolate(ctx: QueryContext): String = {
     logger.debug(s"iterating substitutes for value: $value")
+
     substitutes
       .map { sub =>
-        logger.debug(s"finding path ${sub.path} to interpolate in value: ${value}")
-        dataSetHandler.get(sub.path, ctx) match {
-          case v: String =>
-            logger.debug(s"found value ${v} for path ${sub.path} to interpolate in value: ${value}")
+        sub.container.get(ctx) match {
+          case Right(v: String) =>
             (sub, v)
           case unsupported =>
             logger.warn(s"found unsupported value for interpolation: ${unsupported.toString}, throwing exception")
@@ -43,6 +72,4 @@ class InterpolatedStringValueContainer(value:String, substitutes:Seq[Substitute]
           current.replace(s"${sub.stringToReplace}", newValue)
       }
   }
-
-  override def init(handler: DataSetHandler): Unit = dataSetHandler = handler
 }

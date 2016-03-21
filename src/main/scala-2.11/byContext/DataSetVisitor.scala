@@ -2,16 +2,6 @@ package byContext
 
 case class DataSetItem(currentPath:String,nodeName:String,value:Any)
 
-trait DataSetHandlerExtension{
-  def init(dataSetHandler: DataSetHandler)
-}
-
-class DataSetHandlerExtensionsInitializerExtension(dataSetHandler: DataSetHandler) extends DataSetInspector{
-  override def inspect = {
-    case DataSetItem(_,_, ext: DataSetHandlerExtension) => ext.init(dataSetHandler)
-  }
-}
-
 trait DataSetInspector{
   def inspect : PartialFunction[DataSetItem,Unit]
 }
@@ -34,7 +24,8 @@ class DataSetVisitor() {
       val convertedDataSetItem =
         converters.foldLeft(DataSetItem(currentPath, nodeName, value)){
           (item, converter) => converter.convert.lift(item) match{
-            case Some(newValue)=> item.copy(value = newValue)
+            case Some(newValue)=>
+              item.copy(value = newValue)
             case None => item
           }
         }
