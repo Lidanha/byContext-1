@@ -4,7 +4,8 @@ import byContext.dataSetHandler.DefaultDataSetHandler
 import byContext.index.{IndexBuilderInspector, MapDataIndex}
 import byContext.queryHandler.RecursiveQueryHandler
 import byContext.rawInputHandling.DataSetVisitor
-import byContext.valueContainers.{InterpolatedStringValueMarkerConverter, RefContainerConverter}
+import byContext.valueContainers.RefContainerConverter
+import byContext.valueContainers.stringInterpolation.InterpolatedStringValueMarkerConverter
 
 object EmbeddedAPIBuilder {
   def apply(data:Map[String,Any]):ByContextAPI = {

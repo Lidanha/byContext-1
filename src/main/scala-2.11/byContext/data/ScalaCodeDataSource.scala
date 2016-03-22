@@ -6,7 +6,8 @@ import byContext.model.{PossibleValue, PossibleValueSettings, FilterRule}
 import byContext.rules._
 import byContext.score.ScoreCalculator
 import byContext.score.valueContainers.{ArrayValueContainer, DefaultArrayValueContainer, DefaultSingleValueContainer, SingleValueContainer}
-import byContext.valueContainers.{InterpolatedStringValueMarker, ValueRefMarker}
+import byContext.valueContainers.ValueRefMarker
+import byContext.valueContainers.stringInterpolation.InterpolatedStringValueMarker
 
 trait Filters{
   def filterArray(values: PossibleValue*)(minItemsCount: Int = 1)(implicit calc: ScoreCalculator): ArrayValueContainer =

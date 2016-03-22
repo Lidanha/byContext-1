@@ -1,10 +1,5 @@
 package byContext.rawInputHandling
 
-
-
-
-
-
 class DataSetVisitor {
   def visit(input:Map[String,Any], converters:Seq[DataSetItemConverter] = Seq.empty, inspectors:Seq[DataSetInspector]= Seq.empty) : Unit ={
     processMapNode(None,input)
