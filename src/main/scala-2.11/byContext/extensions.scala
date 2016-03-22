@@ -1,5 +1,0 @@
-package byContext
-
-trait WriterExtension{
-
-}
