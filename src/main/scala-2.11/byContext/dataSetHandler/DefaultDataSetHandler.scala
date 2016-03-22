@@ -12,7 +12,7 @@ class DefaultDataSetHandler(queryHandler: QueryHandler) extends DataSetHandler w
 
   override def get(path: String, queryContext: QueryContext): Any = {
     index.getItem(path) match {
-        //TODO:change to return either[] instead of throwing an exception
+        //TODO:change to return either instead of throwing an exception
       case None => throw new RuntimeException(s"path: $path not found")
       case Some(IndexItem(nodeName, value)) => filter(nodeName, value, queryContext)
     }

@@ -70,12 +70,12 @@ class SyncInMemoryAPITests extends WordSpecLike with Matchers with ScalaCodeData
     "stringInterpolation" -> interpolated("test interpolated <<simple-string-to-interpolate>> !!!"),
     "stringInterpolation_filtered" -> interpolated("test interpolated <<filtered-string-to-interpolate.1.4>> !!!")
   )
+
   implicit val ec = ExecutionContext.global
 
   val api = EmbeddedAPIBuilder(simpleIndex,Some(globals))
   "SyncInMemoryAPI with RecursiveQueryHandler" must {
     "return simple raw value a couple of levels deep" in {
-
       val res = Await.result(api.get("3.1.1",QueryBuilder()), 1 second)
       res should be ("3.1.1")
     }
