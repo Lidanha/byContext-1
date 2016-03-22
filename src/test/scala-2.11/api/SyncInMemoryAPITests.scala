@@ -10,17 +10,25 @@ import scala.concurrent.duration._
 import scala.concurrent.{Await, ExecutionContext}
 class SyncInMemoryAPITests extends WordSpecLike with Matchers with ScalaCodeDataSource with ContextHelper with WireupHelpers{
   implicit val scoreCalculator = new DefaultScoreCalculator()
+  val globals = Map(
+    "simple-string-to-interpolate" -> "simple-string",
+    "filtered-string-to-interpolate" -> Map(
+      "1"->Map(
+        "4"->filterSingle(
+          "inter1"  relevantWhen("subj1" is "v1"),
+          "inter2"  relevantWhen("subj1" is "v2"),
+          ""        relevantWhen("sub1" is "v3")
+        )(true)
+      )
+    ),
+    "value-to-be-referenced" -> "value-to-be-referenced"
+  )
   val simpleIndex = Map(
     "1"->"1",
     "2"->Map(
       "1"->"2.1",
       "2"->"2.2",
-      "3"->"to be interpolated",
-      "4"->filterSingle(
-        "inter1"  relevantWhen("subj1" is "v1"),
-        "inter2"  relevantWhen("subj1" is "v2"),
-        ""        relevantWhen("sub1" is "v3")
-      )(true)
+      "3"->"to be interpolated"
     ),
     "3"->Map(
       "1"->Map(
@@ -57,13 +65,14 @@ class SyncInMemoryAPITests extends WordSpecLike with Matchers with ScalaCodeData
       "1" withRules(("subj1" is "value1" and "subjNum".smallerThanOrEquals(10)) or("subj1" is "value2" and "subjNum".smallerThanOrEquals(7))),
       "2".setAs.defaultValue
     )(true),
-    "ref"->valueRef("3.2.1"),
-    "stringInterpolation" -> interpolated("test interpolated <<2.3>> !!!"),
-    "stringInterpolation_filtered" -> interpolated("test interpolated <<2.4>> !!!")
+    /*"ref-supported-for-globals"->valueRef("3"),*/
+    "ref"->valueRef("value-to-be-referenced"),
+    "stringInterpolation" -> interpolated("test interpolated <<simple-string-to-interpolate>> !!!"),
+    "stringInterpolation_filtered" -> interpolated("test interpolated <<filtered-string-to-interpolate.1.4>> !!!")
   )
   implicit val ec = ExecutionContext.global
 
-  val api = EmbeddedAPIBuilder(simpleIndex)
+  val api = EmbeddedAPIBuilder(simpleIndex,Some(globals))
   "SyncInMemoryAPI with RecursiveQueryHandler" must {
     "return simple raw value a couple of levels deep" in {
 
@@ -148,11 +157,11 @@ class SyncInMemoryAPITests extends WordSpecLike with Matchers with ScalaCodeData
         item("subj1" -> "value1")
         item("subj2" -> "some_val")
       }), 1 second)
-      res should be (Array("1","4"))
+      res should be ("value-to-be-referenced")
     }
     "string interpolation" in {
       val res = Await.result(api.get("stringInterpolation",new QueryBuilder()), 1 second)
-      res should be ("test interpolated to be interpolated !!!")
+      res should be ("test interpolated simple-string !!!")
     }
     "string interpolation with interpolated value filtered" in {
       val res = Await.result(api.get("stringInterpolation_filtered",new QueryBuilder{
@@ -166,5 +175,22 @@ class SyncInMemoryAPITests extends WordSpecLike with Matchers with ScalaCodeData
       }), 1 second)
       res should be ("test interpolated  !!!")
     }
+    /*"string interpolation is supported only for globals" in {
+      intercept[RuntimeException]{
+        val res = Await.result(api.get("stringInterpolation_filtered",new QueryBuilder{
+          item("subj1"->"v3")
+        }), 1 second)
+        res should be ("test interpolated  !!!")
+      }
+    }
+    "value ref is supported only for globals" in {
+      intercept[RuntimeException]{
+        val res = Await.result(api.get("ref",new QueryBuilder{
+          item("subj1" -> "value1")
+          item("subj2" -> "some_val")
+        }), 1 second)
+        res should be (Array("1","4"))
+      }
+    }*/
   }
 }

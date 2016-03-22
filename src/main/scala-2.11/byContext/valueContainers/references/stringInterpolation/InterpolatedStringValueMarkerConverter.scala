@@ -7,7 +7,7 @@ import byContext.score.valueContainers.SingleValueContainer
 import byContext.utils.MapExtensions
 import com.typesafe.scalalogging.StrictLogging
 
-class InterpolatedStringValueMarkerConverter(data:Map[String,Any]) extends DataSetItemConverter with MapExtensions with StrictLogging{
+class InterpolatedStringValueMarkerConverter(globals:Map[String,Any]) extends DataSetItemConverter with MapExtensions with StrictLogging{
   val re = """<<.*>>""".r
 
   override def convert: PartialFunction[DataSetItem, Any] = {
@@ -28,7 +28,7 @@ class InterpolatedStringValueMarkerConverter(data:Map[String,Any]) extends DataS
       .toSeq
   }
   private def findContainer(path:String):SingleValueContainer = {
-    data.findByPath(path) match {
+    globals.findByPath(path) match {
       case container:SingleValueContainer=>container
       case value:String => new SingleValueContainer {
         override def get(ctx: QueryContext): Either[ByContextError, Any] = Right(value)

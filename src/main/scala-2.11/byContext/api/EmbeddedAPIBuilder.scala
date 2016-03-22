@@ -4,18 +4,25 @@ import byContext.dataSetHandler.DefaultDataSetHandler
 import byContext.index.{IndexBuilderInspector, MapDataIndex}
 import byContext.queryHandler.RecursiveQueryHandler
 import byContext.rawInputHandling.DataSetVisitor
-import byContext.valueContainers.RefContainerConverter
+import byContext.valueContainers.references.{VerifyNoRefMarkersConfigured, ValueRefContainerConverter}
 import byContext.valueContainers.stringInterpolation.InterpolatedStringValueMarkerConverter
 
 object EmbeddedAPIBuilder {
-  def apply(data:Map[String,Any]):ByContextAPI = {
+  def apply(dataSet:Map[String,Any], globals:Option[Map[String,Any]]=None):ByContextAPI = {
 
     val indexBuilder = new IndexBuilderInspector()
     val dataSetHandler = new DefaultDataSetHandler(new RecursiveQueryHandler())
 
-    new DataSetVisitor().visit(data,
+    val refConverters =
+      globals
+        .collect{case globals:Map[String,Any] =>
+          Seq(new ValueRefContainerConverter(globals), new InterpolatedStringValueMarkerConverter(globals))
+        }
+        .getOrElse(Seq(VerifyNoRefMarkersConfigured))
+
+    new DataSetVisitor().visit(dataSet,
       inspectors = Seq(indexBuilder),
-      converters = Seq(new RefContainerConverter(data), new InterpolatedStringValueMarkerConverter(data))
+      converters = refConverters
     )
 
     dataSetHandler.loadIndex(new MapDataIndex(indexBuilder.getIndex))

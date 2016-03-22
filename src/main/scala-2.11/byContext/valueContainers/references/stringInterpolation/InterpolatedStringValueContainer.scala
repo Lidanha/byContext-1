@@ -7,7 +7,7 @@ import com.typesafe.scalalogging.StrictLogging
 
 import scala.util.{Failure, Success, Try}
 
-class InterpolatedStringValueContainer(value:String, substitutes:Seq[Substitute])
+class InterpolatedStringValueContainer(val value:String, val substitutes:Seq[Substitute])
   extends SingleValueContainer with StrictLogging{
 
   override def get(ctx: QueryContext): Either[ByContextError, Any] = {

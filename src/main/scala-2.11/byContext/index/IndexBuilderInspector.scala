@@ -8,6 +8,7 @@ class IndexBuilderInspector extends DataSetInspector{
   def getIndex = index.toMap
 
   override def inspect: PartialFunction[DataSetItem, Unit] = {
-    case DataSetItem(fullPath, nodeName, item: Any) => index += fullPath -> IndexItem(nodeName, item)
+    case DataSetItem(fullPath, nodeName, item: Any) =>
+      index += fullPath -> IndexItem(nodeName, item)
   }
 }
