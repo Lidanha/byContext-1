@@ -1,7 +1,7 @@
 package rules
 
-import byContext.Probe
-import byContext.ValueRelevancy._
+import byContext.model.{Probe, ValueRelevancy}
+import ValueRelevancy._
 import byContext.api.QueryBuilder
 import byContext.data.ScalaCodeDataSource
 import byContext.rules._

@@ -1,9 +1,12 @@
-package byContext
+package byContext.dataSetHandler
 
+import byContext.index.{DataIndex, IndexItem}
+import byContext.model.QueryContext
+import byContext.queryHandler.QueryHandler
 import byContext.writers.map.MapRootWriterFactory
 import com.typesafe.scalalogging.StrictLogging
 
-class InMemoryDataSetHandler(queryHandler: QueryHandler) extends DataSetHandler with StrictLogging{
+class DefaultDataSetHandler(queryHandler: QueryHandler) extends DataSetHandler with StrictLogging{
   var index:DataIndex = _
   def loadIndex(idx:DataIndex) = index = idx
 

@@ -1,7 +1,9 @@
 package defaultValueSelectors
 
+import byContext.defaultValueSelection.DefaultMarkedDefaultValueSelector
+import byContext.exceptions.{NoValuesMarkedAsDefaultError, MultipleValuesMarkedAsDefaultError}
+import byContext.model.PossibleValueSettings
 import byContext.score.ValueWithScore
-import byContext.{MultipleValuesMarkedAsDefaultError, DefaultMarkedDefaultValueSelector, NoValuesMarkedAsDefaultError, PossibleValueSettings}
 import org.scalatest.{EitherValues, Matchers, WordSpecLike}
 
 class DefaultMarkedDefaultValueSelectorTests extends WordSpecLike with Matchers with EitherValues {

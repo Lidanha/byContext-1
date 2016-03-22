@@ -1,7 +1,8 @@
 package byContext.score.valueContainers
 
+import byContext.exceptions.ByContextError
+import byContext.model.{PossibleValue, QueryContext}
 import byContext.score.ScoreCalculator
-import byContext.{ByContextError, PossibleValue, QueryContext}
 //TODO:consider the need for this class, it does the same as ArrayValueContainer with the addition of casting the result into a tuple
 class DefaultObjectValueContainer(calculator: ScoreCalculator,
                                   possibleValues:Array[PossibleValue],

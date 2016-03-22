@@ -1,6 +1,6 @@
 package byContext.rules
 
-import byContext.{ValueRelevancy, _}
+import byContext.model.{FilterRule, Probe, QueryContext, ValueRelevancy}
 
 import scala.collection.mutable.ListBuffer
 

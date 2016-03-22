@@ -1,5 +1,6 @@
 import _root_.rules.WireupHelpers
 import byContext._
+import byContext.index.IndexItem
 import org.scalatest.{Matchers, WordSpecLike}
 
 class SimpleMapDataIndexTests extends WordSpecLike  with Matchers with WireupHelpers{

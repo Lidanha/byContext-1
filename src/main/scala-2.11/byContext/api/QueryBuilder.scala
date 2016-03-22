@@ -1,6 +1,6 @@
 package byContext.api
 
-import byContext.QueryContext
+import byContext.model.QueryContext
 
 import scala.collection.mutable
 

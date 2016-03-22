@@ -1,8 +1,9 @@
 package valueContainers
 
+import byContext.exceptions.MinimumResultItemsCountError
+import byContext.model.{PossibleValue, PossibleValueSettings}
 import byContext.score._
 import byContext.score.valueContainers.DefaultObjectValueContainer
-import byContext.{MinimumResultItemsCountError, PossibleValue, PossibleValueSettings}
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.{EitherValues, Matchers, WordSpecLike}
 import rules.ContextHelper

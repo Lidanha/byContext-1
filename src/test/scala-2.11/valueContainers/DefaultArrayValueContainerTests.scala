@@ -2,6 +2,8 @@ package valueContainers
 
 import _root_.rules.ContextHelper
 import byContext._
+import byContext.exceptions.MinimumResultItemsCountError
+import byContext.model.{PossibleValue, PossibleValueSettings}
 import byContext.score.valueContainers.DefaultArrayValueContainer
 import byContext.score._
 import org.scalamock.scalatest.MockFactory

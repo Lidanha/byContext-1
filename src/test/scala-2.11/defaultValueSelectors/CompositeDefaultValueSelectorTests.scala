@@ -1,5 +1,8 @@
 package defaultValueSelectors
 
+import byContext.defaultValueSelection.{CompositeDefaultValueSelector, DefaultValueSelector}
+import byContext.exceptions.{DefaultValueSelectorAggregateErrors, DefaultValueSelectorError}
+import byContext.model.PossibleValueSettings
 import byContext.score.ValueWithScore
 import byContext._
 import org.scalatest.{EitherValues, Matchers, WordSpecLike}

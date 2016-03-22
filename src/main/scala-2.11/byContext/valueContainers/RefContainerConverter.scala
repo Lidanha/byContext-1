@@ -1,6 +1,7 @@
 package byContext.valueContainers
 
-import byContext.{MapExtensions, DataSetItem, DataSetItemConverter}
+import byContext.rawInputHandling.{DataSetItemConverter, DataSetItem}
+import byContext.utils.MapExtensions
 
 class RefContainerConverter(data:Map[String,Any]) extends DataSetItemConverter with MapExtensions{
   override def convert: PartialFunction[DataSetItem, Any] = {

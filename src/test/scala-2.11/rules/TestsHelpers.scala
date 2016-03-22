@@ -2,6 +2,9 @@ package rules
 
 import byContext.api.QueryBuilder
 import byContext._
+import byContext.index.{IndexBuilderInspector, MapDataIndex, DataIndex}
+import byContext.model.{FilterRule, Probe, ValueRelevancy, QueryContext}
+import byContext.rawInputHandling.DataSetVisitor
 import org.scalamock.scalatest.MockFactory
 
 trait RulesTestsHelper {

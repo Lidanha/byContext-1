@@ -1,12 +1,12 @@
 package rules
 
-import byContext.Probe
+import byContext.model.{Probe, ValueRelevancy}
 import byContext.rules.NotRuleContainer
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.{Matchers, WordSpecLike}
 
 class NotRuleContainerTests extends WordSpecLike with Matchers with RulesTestsHelper with MockFactory with ContextHelper{
-  import byContext.ValueRelevancy._
+  import ValueRelevancy._
   "NotRuleContainer" must {
     "evaluate to relevant in internal rule evaluates to NotRelevant" in {
       val p = mock[Probe]

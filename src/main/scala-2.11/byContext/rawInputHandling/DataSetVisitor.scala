@@ -1,17 +1,13 @@
-package byContext
+package byContext.rawInputHandling
 
-case class DataSetItem(currentPath:String,nodeName:String,value:Any)
 
-trait DataSetInspector{
-  def inspect : PartialFunction[DataSetItem,Unit]
-}
-trait DataSetItemConverter{
-  def convert : PartialFunction[DataSetItem,Any]
-}
 
-class DataSetVisitor() {
-  def visit(dataToIndex:Map[String,Any], converters:Seq[DataSetItemConverter] = Seq.empty, inspectors:Seq[DataSetInspector]= Seq.empty) : Unit ={
-    processMapNode(None,dataToIndex)
+
+
+
+class DataSetVisitor {
+  def visit(input:Map[String,Any], converters:Seq[DataSetItemConverter] = Seq.empty, inspectors:Seq[DataSetInspector]= Seq.empty) : Unit ={
+    processMapNode(None,input)
 
     def processMapNode(parentPath:Option[String], node:Map[String,Any]) :Unit = {
       val currentPath = parentPath.fold("")(p=>s"$p.")

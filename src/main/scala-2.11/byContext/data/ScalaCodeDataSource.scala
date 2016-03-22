@@ -1,6 +1,8 @@
 package byContext.data
 
 import byContext._
+import byContext.defaultValueSelection.{DefaultMarkedDefaultValueSelector, HighestScoreDefaultValueSelector, CompositeDefaultValueSelector}
+import byContext.model.{PossibleValue, PossibleValueSettings, FilterRule}
 import byContext.rules._
 import byContext.score.ScoreCalculator
 import byContext.score.valueContainers.{ArrayValueContainer, DefaultArrayValueContainer, DefaultSingleValueContainer, SingleValueContainer}

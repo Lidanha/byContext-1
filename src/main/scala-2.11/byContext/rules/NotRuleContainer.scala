@@ -1,9 +1,9 @@
 package byContext.rules
 
-import byContext.{FilterRule, Probe, QueryContext}
+import byContext.model.{FilterRule, Probe, QueryContext, ValueRelevancy}
 
 case class NotRuleContainer(rule: FilterRule) extends FilterRule{
-  import byContext.ValueRelevancy._
+  import ValueRelevancy._
   override def evaluate(ctx: QueryContext, probe:Probe): Unit = {
     val internalProbe = new Probe{
       override def setRelevancy(r: ValueRelevancy): Unit = r match {

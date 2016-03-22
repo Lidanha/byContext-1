@@ -2,6 +2,9 @@ package valueContainers
 
 import _root_.rules.{ContextHelper}
 import byContext._
+import byContext.defaultValueSelection.DefaultValueSelector
+import byContext.exceptions.{RequiredValueMissingError, MultipleValuesWithSameScoreError}
+import byContext.model.{PossibleValue, PossibleValueSettings}
 import byContext.score._
 import byContext.score.valueContainers.DefaultSingleValueContainer
 import org.scalamock.scalatest.MockFactory

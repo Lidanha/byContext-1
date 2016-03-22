@@ -1,4 +1,4 @@
-import byContext.{Probe, QueryContext, FilterRule}
+import byContext.model.{FilterRule, Probe, QueryContext}
 import byContext.data.ScalaCodeDataSource
 import byContext.rules._
 import org.scalatest.{Matchers, WordSpecLike}

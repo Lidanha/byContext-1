@@ -1,6 +1,7 @@
 package byContext.api
 
 import byContext._
+import byContext.dataSetHandler.DataSetHandler
 
 import scala.concurrent.{ExecutionContext, Future}
 

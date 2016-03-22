@@ -1,4 +1,4 @@
-package byContext
+package byContext.utils
 
 trait MapExtensions {
   implicit def extendMap(src:Map[String,Any]) = new {

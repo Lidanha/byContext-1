@@ -1,6 +1,6 @@
 package byContext.score
 
-import byContext.{PossibleValue, ProbeImpl, QueryContext}
+import byContext.model.{PossibleValue, ProbeImpl, QueryContext}
 import com.typesafe.scalalogging.StrictLogging
 
 class DefaultScoreCalculator extends ScoreCalculator with StrictLogging{

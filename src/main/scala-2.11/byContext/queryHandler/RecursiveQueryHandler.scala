@@ -1,12 +1,10 @@
-package byContext
+package byContext.queryHandler
 
-import byContext.score.valueContainers.{ArrayValueContainer, ObjectValueContainer, SingleValueContainer}
+import byContext.model.QueryContext
+import byContext.score.valueContainers.{ObjectValueContainer, ArrayValueContainer, SingleValueContainer}
 import byContext.writers.Writer
 import com.typesafe.scalalogging.StrictLogging
 
-trait QueryHandler{
-  def query(ctx:QueryContext, data:Any, writer: Writer) : Unit
-}
 class RecursiveQueryHandler extends QueryHandler with StrictLogging{
   def query(ctx:QueryContext, data:Any, writer: Writer) : Unit = process(data, writer)(ctx)
 

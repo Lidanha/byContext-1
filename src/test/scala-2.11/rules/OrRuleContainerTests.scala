@@ -1,8 +1,8 @@
 package rules
 
 import byContext.api.QueryBuilder
+import byContext.model.{Probe, ValueRelevancy}
 import byContext.rules.{OrRuleContainer, TextMatch}
-import byContext.{Probe, ValueRelevancy}
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.{Matchers, WordSpecLike}
 

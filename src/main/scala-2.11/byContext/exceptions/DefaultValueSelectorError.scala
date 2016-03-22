@@ -1,0 +1,3 @@
+package byContext.exceptions
+
+abstract class DefaultValueSelectorError extends ByContextError

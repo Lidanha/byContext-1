@@ -1,0 +1,3 @@
+package byContext.exceptions
+
+case class DefaultValueSelectorAggregateErrors(errors:Array[DefaultValueSelectorError]) extends DefaultValueSelectorError

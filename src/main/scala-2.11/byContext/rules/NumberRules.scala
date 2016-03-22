@@ -1,6 +1,6 @@
 package byContext.rules
 
-import byContext.{FilterRule, Probe, QueryContext, ValueRelevancy}
+import byContext.model.{FilterRule, Probe, ValueRelevancy, QueryContext}
 
 abstract class NumberRule(val subj:String, val v:Double) extends FilterRule {
   override def evaluate(ctx: QueryContext, probe: Probe): Unit = {

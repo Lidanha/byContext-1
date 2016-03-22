@@ -1,5 +1,7 @@
 import _root_.rules.ContextHelper
-import byContext._
+import byContext.exceptions.ByContextError
+import byContext.model.QueryContext
+import byContext.queryHandler.RecursiveQueryHandler
 import byContext.score.valueContainers.{ArrayValueContainer, ObjectValueContainer, SingleValueContainer}
 import byContext.writers.map.MapRootWriterFactory
 import org.scalatest.{Matchers, WordSpecLike}

@@ -1,4 +1,4 @@
-import byContext.PossibleValue
+import byContext.model.PossibleValue
 import byContext.score.DefaultScoreCalculator
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.{Matchers, WordSpecLike}

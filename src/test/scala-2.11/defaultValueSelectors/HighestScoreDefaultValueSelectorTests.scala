@@ -1,7 +1,9 @@
 package defaultValueSelectors
 
+import byContext.defaultValueSelection.HighestScoreDefaultValueSelector
+import byContext.exceptions.{EmptyValuesWithScoreProvidedError, MultipleValuesWithSameScoreError}
+import byContext.model.PossibleValueSettings
 import byContext.score.ValueWithScore
-import byContext.{EmptyValuesWithScoreProvidedError, HighestScoreDefaultValueSelector, MultipleValuesWithSameScoreError, PossibleValueSettings}
 import org.scalatest.{EitherValues, Matchers, WordSpecLike}
 
 class HighestScoreDefaultValueSelectorTests extends WordSpecLike with Matchers with EitherValues{

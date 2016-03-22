@@ -1,13 +1,16 @@
 package byContext.api
 
-import byContext._
+import byContext.dataSetHandler.DefaultDataSetHandler
+import byContext.index.{IndexBuilderInspector, MapDataIndex}
+import byContext.queryHandler.RecursiveQueryHandler
+import byContext.rawInputHandling.DataSetVisitor
 import byContext.valueContainers.{InterpolatedStringValueMarkerConverter, RefContainerConverter}
 
 object EmbeddedAPIBuilder {
   def apply(data:Map[String,Any]):ByContextAPI = {
 
     val indexBuilder = new IndexBuilderInspector()
-    val dataSetHandler = new InMemoryDataSetHandler(new RecursiveQueryHandler())
+    val dataSetHandler = new DefaultDataSetHandler(new RecursiveQueryHandler())
 
     new DataSetVisitor().visit(data,
       inspectors = Seq(indexBuilder),

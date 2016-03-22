@@ -1,6 +1,7 @@
 package byContext.score.valueContainers
 
-import byContext.{MinimumResultItemsCountError, PossibleValue, QueryContext, ByContextError}
+import byContext.exceptions.{MinimumResultItemsCountError, ByContextError}
+import byContext.model.{PossibleValue, QueryContext}
 import byContext.score.{ScoreCalculator}
 
 class DefaultArrayValueContainer(calculator: ScoreCalculator, possibleValues:Array[PossibleValue], minResultItemsCount:Int)

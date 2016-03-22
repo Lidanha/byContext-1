@@ -1,6 +1,9 @@
 package byContext.score.valueContainers
 
 import byContext._
+import byContext.defaultValueSelection.DefaultValueSelector
+import byContext.exceptions.{RequiredValueMissingError, ByContextError}
+import byContext.model.{PossibleValue, QueryContext}
 import byContext.score._
 
 class DefaultSingleValueContainer(calculator: ScoreCalculator, possibleValues:Array[PossibleValue],

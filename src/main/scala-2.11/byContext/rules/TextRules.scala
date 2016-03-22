@@ -1,6 +1,7 @@
 package byContext.rules
 
-import byContext.{FilterRule, Probe, QueryContext, ValueRelevancy}
+import byContext.model.{FilterRule, Probe, ValueRelevancy, QueryContext}
+
 object TextMatch{
   def apply(subjectAndValue:(String,String), caseSensitive:Boolean = false) : TextMatch =
     new TextMatch(subjectAndValue._1, subjectAndValue._2, caseSensitive)

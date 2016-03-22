@@ -1,0 +1,5 @@
+package byContext.exceptions
+
+import byContext.score.ValueWithScore
+
+case class MultipleValuesMarkedAsDefaultError(conflictingValues:Array[ValueWithScore]) extends DefaultValueSelectorError
