@@ -1,5 +1,5 @@
 package byContext.model
 
-trait QueryContext {
+trait QueryContext extends ContextOps{
   def getAs[T](key:String):Option[T]
 }

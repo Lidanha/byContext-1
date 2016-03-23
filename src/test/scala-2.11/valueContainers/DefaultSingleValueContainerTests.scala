@@ -1,23 +1,23 @@
 package valueContainers
 
-import _root_.rules.{ContextHelper}
-import byContext._
+import _root_.rules.{ContextHelper, Creators}
 import byContext.defaultValueSelection.DefaultValueSelector
-import byContext.exceptions.{RequiredValueMissingError, MultipleValuesWithSameScoreError}
-import byContext.model.{PossibleValue, PossibleValueSettings}
+import byContext.exceptions.{MultipleValuesWithSameScoreError, RequiredValueMissingError}
+import byContext.model.PossibleValue
 import byContext.score._
 import byContext.score.valueContainers.DefaultSingleValueContainer
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.{EitherValues, Matchers, WordSpecLike}
 
-class DefaultSingleValueContainerTests extends WordSpecLike with Matchers with MockFactory with EitherValues with ContextHelper{
+class DefaultSingleValueContainerTests extends WordSpecLike with Matchers with MockFactory
+  with EitherValues with ContextHelper with Creators{
   val emptyValues = Array.empty[PossibleValue]
 
   def calc(values: Array[Any]): ScoreCalculator = {
     val calculator = stub[ScoreCalculator]
     (calculator.calculate _)
       .when(emptyContext, emptyValues)
-      .returns(values.map(ValueWithScore(_, 1, PossibleValueSettings())))
+      .returns(values.map(valueWithScore(_,1)))
     calculator
   }
   def selector() = new DefaultValueSelector {
@@ -27,7 +27,7 @@ class DefaultSingleValueContainerTests extends WordSpecLike with Matchers with M
   }
 
   def single(values: Array[Any], required: Boolean): DefaultSingleValueContainer = {
-    new DefaultSingleValueContainer(calc(values), emptyValues, selector(), required)
+    new DefaultSingleValueContainer("", calc(values), emptyValues, selector(), required)
   }
 
   "DefaultSingleValueContainer" must {
@@ -35,13 +35,14 @@ class DefaultSingleValueContainerTests extends WordSpecLike with Matchers with M
       single(Array("a"), true).get(emptyContext).right.value should be("a")
     }
     "calls DefaultValueSelector when more than one value returns and returns the value that is selected by DefaultValueSelector" in {
-      val valueWithScores = Array(ValueWithScore("1",1, PossibleValueSettings()),ValueWithScore("2",2, PossibleValueSettings()))
+      val valueWithScores = Array(valueWithScore("1",1),valueWithScore("2",2))
       val selectorMock = mock[DefaultValueSelector]
-      (selectorMock.select _).expects(valueWithScores.toIterable).returning(Right(ValueWithScore("1",1, PossibleValueSettings())))
+      (selectorMock.select _).expects(valueWithScores.toIterable).returning(Right(valueWithScore("1",1)))
 
       val calcStub = stub[ScoreCalculator]
       (calcStub.calculate _).when(*,*).returns(valueWithScores)
-      new DefaultSingleValueContainer(calcStub, emptyValues, selectorMock, true).get(emptyContext).right.value should be ("1")
+      new DefaultSingleValueContainer("", calcStub, emptyValues, selectorMock, true)
+        .get(emptyContext).right.value should be ("1")
 
       single(Array("a"), true).get(emptyContext).right.value should be("a")
     }

@@ -1,5 +1,5 @@
 package byContext.score
 
-import byContext.model.PossibleValueSettings
+import byContext.model.PossibleValue
 
-case class ValueWithScore(value:Any, score:Int, settings: PossibleValueSettings)
+case class ValueWithScore(possibleValue:PossibleValue, score:Int)

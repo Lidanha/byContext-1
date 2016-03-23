@@ -1,10 +1,10 @@
 package rules
 
 import byContext.api.QueryBuilder
-import byContext._
-import byContext.index.{IndexBuilderInspector, MapDataIndex, DataIndex}
-import byContext.model.{FilterRule, Probe, ValueRelevancy, QueryContext}
+import byContext.index.{DataIndex, IndexBuilderInspector, MapDataIndex}
+import byContext.model._
 import byContext.rawInputHandling.DataSetVisitor
+import byContext.score.ValueWithScore
 import org.scalamock.scalatest.MockFactory
 
 trait RulesTestsHelper {
@@ -34,4 +34,10 @@ trait WireupHelpers{
     dataSetVisitor.visit(data, inspectors = Seq(indexBuilder))
     new MapDataIndex(indexBuilder.getIndex)
   }
+
 }
+trait Creators{
+  def valueWithScore(v:Any, score:Int, isDefault:Boolean=false)=
+    ValueWithScore(PossibleValue(v,None,PossibleValueSettings(isDefault)),score)
+}
+

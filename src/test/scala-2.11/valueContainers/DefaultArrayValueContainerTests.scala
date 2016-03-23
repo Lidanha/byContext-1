@@ -1,27 +1,27 @@
 package valueContainers
 
-import _root_.rules.ContextHelper
-import byContext._
+import _root_.rules.{ContextHelper, Creators}
 import byContext.exceptions.MinimumResultItemsCountError
-import byContext.model.{PossibleValue, PossibleValueSettings}
-import byContext.score.valueContainers.DefaultArrayValueContainer
+import byContext.model.PossibleValue
 import byContext.score._
+import byContext.score.valueContainers.DefaultArrayValueContainer
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.{EitherValues, Matchers, WordSpecLike}
 
-class DefaultArrayValueContainerTests extends WordSpecLike with Matchers with EitherValues with MockFactory with ContextHelper{
+class DefaultArrayValueContainerTests extends WordSpecLike with Matchers
+  with EitherValues with MockFactory with ContextHelper with Creators{
   val emptyValues = Array.empty[PossibleValue]
 
   def calc(values: Array[Any]): ScoreCalculator = {
     val calculator = stub[ScoreCalculator]
     (calculator.calculate _)
       .when(emptyContext, emptyValues)
-      .returns(values.map(ValueWithScore(_,1, PossibleValueSettings())))
+      .returns(values.map(valueWithScore(_,1)))
     calculator
   }
 
   def arr(values: Array[Any])(minAllowedItemsCount:Int) =
-    new DefaultArrayValueContainer(calc(values), emptyValues, minAllowedItemsCount)
+    new DefaultArrayValueContainer("",calc(values), emptyValues, minAllowedItemsCount)
 
   "DefaultArrayValueContainer" must {
     "return Left(MinimumResultItemsCountError) when score calculator returns less items than the minimum num configured" in {

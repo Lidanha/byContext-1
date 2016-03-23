@@ -1,24 +1,28 @@
 package byContext.data
 
-import byContext._
-import byContext.defaultValueSelection.{DefaultMarkedDefaultValueSelector, HighestScoreDefaultValueSelector, CompositeDefaultValueSelector}
-import byContext.model.{PossibleValue, PossibleValueSettings, FilterRule}
+import byContext.model.{FilterRule, PossibleValue, PossibleValueSettings}
 import byContext.rules._
 import byContext.score.ScoreCalculator
-import byContext.score.valueContainers.{ArrayValueContainer, DefaultArrayValueContainer, DefaultSingleValueContainer, SingleValueContainer}
+import byContext.score.valueContainers._
 import byContext.valueContainers.ValueRefMarker
 import byContext.valueContainers.stringInterpolation.InterpolatedStringValueMarker
 
 trait Filters{
-  def filterArray(values: PossibleValue*)(minItemsCount: Int = 1)(implicit calc: ScoreCalculator): ArrayValueContainer =
-    new DefaultArrayValueContainer(calc, values.toArray, minItemsCount)
+  def filterArray(values: PossibleValue*)(minItemsCount: Int = 1)(implicit calc: ScoreCalculator) =
+    new ArrayValueMarker {
+      override val minResultItemsCount: Int = minItemsCount
+      override val possibleValues: Array[PossibleValue] = values.toArray
+    }
 
   /*def obj(values: (String, Any)*)(minItemsCount: Int = 1)(implicit calc: ScoreCalculator): ObjectValueContainer =
     new DefaultObjectValueContainer(calc, values.map(PossibleValue(_, Array.empty[FilterRule])).toArray, minItemsCount)*/
 
-  def filterSingle(values: PossibleValue*)(isRequired: Boolean = true)(implicit calc: ScoreCalculator): SingleValueContainer =
-    new DefaultSingleValueContainer(calc, values.toArray,
-      new CompositeDefaultValueSelector(Seq(new HighestScoreDefaultValueSelector(),new DefaultMarkedDefaultValueSelector())), isRequired)
+  def filterSingle(values: PossibleValue*)(required: Boolean = true)(implicit calc: ScoreCalculator) =
+    new SingleValueMarker {
+      override val possibleValues: Array[PossibleValue] = values.toArray
+      override val isRequired: Boolean = required
+    }
+
   def valueRef(p:String):ValueRefMarker = new ValueRefMarker{
     override val path: String = p
   }
@@ -54,12 +58,15 @@ trait ScalaCodeDataSource extends Filters with RulesBuilders{
 
   implicit def possibleValueBuilder(value:Any) = new PossibleValueBuilder(value)
 
-  trait PossibleValueSettingsBuilder extends WithRules{
+  trait PossibleValueSettingsBuilder extends WithRules with WithMetadata{
     def defaultValue : PossibleValueSettingsBuilder
     private[data] def buildPossibleValue : PossibleValue
   }
   trait WithRules{
     def withRules(rule:FilterRule) : PossibleValueSettingsBuilder
+  }
+  trait WithMetadata{
+    def withMetadata(metadata:(String,Any)*): PossibleValueSettingsBuilder
   }
 
   implicit def possibleValueExtractor(builder:PossibleValueSettingsBuilder) : PossibleValue = builder.buildPossibleValue
@@ -68,7 +75,10 @@ trait ScalaCodeDataSource extends Filters with RulesBuilders{
   class PossibleValueBuilder(val value:Any) extends PossibleValueSettingsBuilder {
     var isDefault = false
     var rule:Option[FilterRule] = None
+    var metadata:Option[Map[String,Any]] = None
+
     def setAs : PossibleValueSettingsBuilder = this
+
 
     override def defaultValue: PossibleValueSettingsBuilder = {
       isDefault = true
@@ -83,5 +93,10 @@ trait ScalaCodeDataSource extends Filters with RulesBuilders{
     /*override def withRules(rule:FilterRule) : PossibleValue =
       PossibleValue(value,Some(rule), PossibleValueSettings(isDefault = this.isDefault))*/
     override def buildPossibleValue: PossibleValue = PossibleValue(value,rule, PossibleValueSettings(isDefault = this.isDefault))
+
+    override def withMetadata(items: (String, Any)*): PossibleValueSettingsBuilder = {
+      metadata = Some(items.toMap)
+      this
+    }
   }
 }

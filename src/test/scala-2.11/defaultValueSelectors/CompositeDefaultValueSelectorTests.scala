@@ -2,14 +2,14 @@ package defaultValueSelectors
 
 import byContext.defaultValueSelection.{CompositeDefaultValueSelector, DefaultValueSelector}
 import byContext.exceptions.{DefaultValueSelectorAggregateErrors, DefaultValueSelectorError}
-import byContext.model.PossibleValueSettings
+import byContext.model.PossibleValue
 import byContext.score.ValueWithScore
-import byContext._
 import org.scalatest.{EitherValues, Matchers, WordSpecLike}
 
 class CompositeDefaultValueSelectorTests extends WordSpecLike with Matchers with EitherValues {
-  val valueWithScore_1 = ValueWithScore("1",0,PossibleValueSettings())
-  val valueWithScore_2 = ValueWithScore("2",0,PossibleValueSettings())
+
+  val valueWithScore_1 = ValueWithScore(PossibleValue("1",None),0)
+  val valueWithScore_2 = ValueWithScore(PossibleValue("2",None),0)
   def errSelector = new DefaultValueSelector{
     override def select(valuesWithScore: Iterable[ValueWithScore]) = Left(new DefaultValueSelectorError{})
   }

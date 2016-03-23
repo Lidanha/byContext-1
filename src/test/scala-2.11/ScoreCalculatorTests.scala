@@ -11,21 +11,21 @@ class ScoreCalculatorTests extends WordSpecLike with Matchers with RulesTestsHel
 
       calcResult.size should be (1)
       calcResult.head.score should be (1)
-      calcResult.head.value should be ("v")
+      calcResult.head.possibleValue.value should be ("v")
     }
     "a single value with a single neutral rule should be selected" in {
       val calcResult = new DefaultScoreCalculator().calculate(emptyContext, Array(PossibleValue("v", Some(neutral))))
 
       calcResult.size should be (1)
       calcResult.head.score should be (0)
-      calcResult.head.value should be ("v")
+      calcResult.head.possibleValue.value should be ("v")
     }
     "a single value without rules should be selected" in {
       val calcResult = new DefaultScoreCalculator().calculate(emptyContext, Array(PossibleValue("v", None)))
 
       calcResult.size should be (1)
       calcResult.head.score should be (0)
-      calcResult.head.value should be ("v")
+      calcResult.head.possibleValue.value should be ("v")
     }
     "an empty list of values should return an empty calc result" in {
       val calcResult = new DefaultScoreCalculator().calculate(emptyContext, Array.empty[PossibleValue])
@@ -43,7 +43,7 @@ class ScoreCalculatorTests extends WordSpecLike with Matchers with RulesTestsHel
 
       calcResult.size should be (1)
       calcResult.head.score should be (1)
-      calcResult.head.value should be ("a")
+      calcResult.head.possibleValue.value should be ("a")
     }
     "two values one has a relevant rule and the other a neutral rule selects both, with higher score to the first" in {
       val calcResult = new DefaultScoreCalculator().calculate(emptyContext,
@@ -52,9 +52,9 @@ class ScoreCalculatorTests extends WordSpecLike with Matchers with RulesTestsHel
       calcResult.size should be (2)
       val sorted = calcResult.sortBy(_.score).reverse
       sorted.head.score should be (1)
-      sorted.head.value should be ("a")
+      sorted.head.possibleValue.value should be ("a")
 
-      sorted(1).value should be ("b")
+      sorted(1).possibleValue.value should be ("b")
       sorted(1).score should be (0)
     }
     "two relevant values, return both" in {
@@ -63,10 +63,10 @@ class ScoreCalculatorTests extends WordSpecLike with Matchers with RulesTestsHel
 
       calcResult.size should be (2)
       calcResult.head.score should be (1)
-      calcResult.head.value should be ("a")
+      calcResult.head.possibleValue.value should be ("a")
 
       calcResult(1).score should be (1)
-      calcResult(1).value should be ("b")
+      calcResult(1).possibleValue.value should be ("b")
     }
   }
 }

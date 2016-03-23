@@ -18,7 +18,7 @@ class RecursiveQueryHandlerTests extends WordSpecLike with Matchers with Context
     override def get(ctx: QueryContext): Either[ByContextError, Any] = Right(value)
   }
   def obj(values:Array[(String,Any)]): ObjectValueContainer = new ObjectValueContainer {
-    override def get(ctx: QueryContext): Either[ByContextError, Array[(String, Any)]] = Right(values)
+    override def get(ctx: QueryContext): Either[ByContextError, Map[String, Any]] = Right(values.toMap)
   }
   def arr(values:Iterable[Any]):ArrayValueContainer = new ArrayValueContainer {
     override def get(ctx: QueryContext): Either[ByContextError, Array[Any]] = Right(values.toArray)

@@ -5,5 +5,5 @@ import byContext.model.QueryContext
 import byContext.valueContainers.ValueContainer
 
 trait ObjectValueContainer extends ValueContainer{
-  def get(ctx:QueryContext) : Either[ByContextError,Array[(String,Any)]]
+  def get(ctx:QueryContext) : Either[ByContextError,Map[String,Any]]
 }

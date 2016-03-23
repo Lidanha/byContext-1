@@ -2,31 +2,32 @@ package defaultValueSelectors
 
 import byContext.defaultValueSelection.HighestScoreDefaultValueSelector
 import byContext.exceptions.{EmptyValuesWithScoreProvidedError, MultipleValuesWithSameScoreError}
-import byContext.model.PossibleValueSettings
 import byContext.score.ValueWithScore
 import org.scalatest.{EitherValues, Matchers, WordSpecLike}
+import rules.Creators
 
-class HighestScoreDefaultValueSelectorTests extends WordSpecLike with Matchers with EitherValues{
+class HighestScoreDefaultValueSelectorTests extends WordSpecLike with Matchers with EitherValues
+  with Creators{
   "HighestScoreDefaultValueSelector" must {
     "select the single item with highest score" in {
       new HighestScoreDefaultValueSelector().select(
-        Array(ValueWithScore("",1, PossibleValueSettings()),
-          ValueWithScore("",2, PossibleValueSettings()),
-          ValueWithScore("",3, PossibleValueSettings()),
-          ValueWithScore("",4, PossibleValueSettings()),
-          ValueWithScore("",10, PossibleValueSettings()),
-          ValueWithScore("",5, PossibleValueSettings()),
-          ValueWithScore("",6, PossibleValueSettings()))).right.value should be (ValueWithScore("",10, PossibleValueSettings()))
+        Array(valueWithScore("",1),
+          valueWithScore("",2),
+          valueWithScore("",3),
+          valueWithScore("",4),
+          valueWithScore("",10),
+          valueWithScore("",5),
+          valueWithScore("",6))).right.value should be (valueWithScore("",10))
     }
     "return ValuesWithSameScoreError if more than one value has the same score" in {
       new HighestScoreDefaultValueSelector().select(
-        Array(ValueWithScore("",1, PossibleValueSettings()),
-          ValueWithScore("",2, PossibleValueSettings()),
-          ValueWithScore("",3, PossibleValueSettings()),
-          ValueWithScore("",4, PossibleValueSettings()),
-          ValueWithScore("",10, PossibleValueSettings()),
-          ValueWithScore("",10, PossibleValueSettings()),
-          ValueWithScore("",6, PossibleValueSettings()))).left.value shouldBe a[MultipleValuesWithSameScoreError]
+        Array(valueWithScore("",1),
+          valueWithScore("",2),
+          valueWithScore("",3),
+          valueWithScore("",4),
+          valueWithScore("",10),
+          valueWithScore("",10),
+          valueWithScore("",6))).left.value shouldBe a[MultipleValuesWithSameScoreError]
     }
     "return EmptyValuesWithScoreProvidedError if empty list of values is provided" in {
       new HighestScoreDefaultValueSelector().select(

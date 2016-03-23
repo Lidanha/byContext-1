@@ -18,6 +18,11 @@ class QueryBuilder extends QueryContext{
     }
     s"{QueryContext: ${formatItems}"
   }
+
+  val versions = scala.collection.mutable.Map[String,Int]()
+  override def valueSelected(path: String, metadata: Map[String, Any]): Unit = {
+    metadata.get("version").foreach(v=>versions += path->v.toString.toInt)
+  }
 }
 
 object QueryBuilder{

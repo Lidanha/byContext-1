@@ -1,31 +1,53 @@
 package byContext.api
 
 import byContext.dataSetHandler.DefaultDataSetHandler
-import byContext.index.{IndexBuilderInspector, MapDataIndex}
+import byContext.defaultValueSelection.{CompositeDefaultValueSelector, DefaultMarkedDefaultValueSelector, HighestScoreDefaultValueSelector}
+import byContext.index.{DataIndex, IndexBuilderInspector, MapDataIndex}
 import byContext.queryHandler.RecursiveQueryHandler
-import byContext.rawInputHandling.DataSetVisitor
-import byContext.valueContainers.references.{VerifyNoRefMarkersConfigured, ValueRefContainerConverter}
+import byContext.rawInputHandling.{DataSetItemConverter, DataSetVisitor}
+import byContext.score.DefaultScoreCalculator
+import byContext.score.valueContainers.{ArrayValueConverter, SingleValueConverter}
+import byContext.valueContainers.references.{ValueRefContainerConverter, VerifyNoRefMarkersConfigured}
 import byContext.valueContainers.stringInterpolation.InterpolatedStringValueMarkerConverter
 
 object EmbeddedAPIBuilder {
   def apply(dataSet:Map[String,Any], globals:Option[Map[String,Any]]=None):ByContextAPI = {
 
-    val indexBuilder = new IndexBuilderInspector()
     val dataSetHandler = new DefaultDataSetHandler(new RecursiveQueryHandler())
+    val scoreCalculator = new DefaultScoreCalculator()
+    val defaultValueSelector = new CompositeDefaultValueSelector(Seq(
+      new HighestScoreDefaultValueSelector(),new DefaultMarkedDefaultValueSelector()
+    ))
 
-    val refConverters =
+    val converters = Seq(
+      new SingleValueConverter(scoreCalculator, defaultValueSelector),
+      new ArrayValueConverter(scoreCalculator)
+    )
+
+    val refConverters: Seq[DataSetItemConverter] =
       globals
-        .collect{case globals:Map[String,Any] =>
-          Seq(new ValueRefContainerConverter(globals), new InterpolatedStringValueMarkerConverter(globals))
+        .map{input =>
+
+          val globalsIndex = buildIndex(input,converters ++ Seq(VerifyNoRefMarkersConfigured))
+
+          Seq(
+            new ValueRefContainerConverter(globalsIndex),
+            new InterpolatedStringValueMarkerConverter(globalsIndex)
+          )
         }
         .getOrElse(Seq(VerifyNoRefMarkersConfigured))
 
-    new DataSetVisitor().visit(dataSet,
-      inspectors = Seq(indexBuilder),
-      converters = refConverters
-    )
+    val dataIndex = buildIndex(dataSet,converters ++ refConverters)
 
-    dataSetHandler.loadIndex(new MapDataIndex(indexBuilder.getIndex))
+    dataSetHandler.loadIndex(dataIndex)
     new SyncInMemoryAPI(dataSetHandler)
+  }
+  def buildIndex(input:Map[String,Any], converters:Seq[DataSetItemConverter]):DataIndex = {
+    val indexBuilder = new IndexBuilderInspector()
+    new DataSetVisitor().visit(input,
+      inspectors = Seq(indexBuilder),
+      converters = converters
+    )
+    new MapDataIndex(indexBuilder.getIndex)
   }
 }

@@ -1,12 +1,17 @@
 package byContext.valueContainers.references
 
+import byContext.index.{IndexItem, DataIndex}
 import byContext.rawInputHandling.{DataSetItem, DataSetItemConverter}
 import byContext.utils.MapExtensions
 import byContext.valueContainers.ValueRefMarker
 
-class ValueRefContainerConverter(data:Map[String,Any]) extends DataSetItemConverter with MapExtensions{
+class ValueRefContainerConverter(globals:DataIndex) extends DataSetItemConverter with MapExtensions{
   override def convert: PartialFunction[DataSetItem, Any] = {
     case DataSetItem(_,_,container:ValueRefMarker) =>
-      data.findByPath(container.path)
+      globals
+        .getItem(container.path) match {
+        case Some(IndexItem(_,v)) => v
+        case None => throw new RuntimeException(s"path ${container.path} not found")
+      }
   }
 }

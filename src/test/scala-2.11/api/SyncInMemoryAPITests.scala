@@ -44,11 +44,11 @@ class SyncInMemoryAPITests extends WordSpecLike with Matchers with ScalaCodeData
       ),
       "2"-> Map(
         "1" -> filterArray(
-          "1" relevantWhen("subj1" is "value1"),
-          "2" relevantWhen("subj2" is "value2"),
-          "3" relevantWhen("subj1" is "value2"),
-          "4" relevantWhen("subj1" is "value1"),
-          "5" relevantWhen("subj2" is "value2")
+          "1" relevantWhen("subj1" is "value1") withMetadata("ver"->1,"id"->"id_1"),
+          "2" relevantWhen("subj2" is "value2") withMetadata("ver"->2,"id"->"id_2"),
+          "3" relevantWhen("subj1" is "value2") withMetadata("ver"->3,"id"->"id_3"),
+          "4" relevantWhen("subj1" is "value1") withMetadata("ver"->4,"id"->"id_4"),
+          "5" relevantWhen("subj2" is "value2") withMetadata("ver"->5,"id"->"id_5")
         )(1)
       )
     ),
@@ -174,6 +174,10 @@ class SyncInMemoryAPITests extends WordSpecLike with Matchers with ScalaCodeData
         item("subj1"->"v3")
       }), 1 second)
       res should be ("test interpolated  !!!")
+    }
+    "collect metadata" in {
+      val res1 = Await.result(api.get("3.2.1",new QueryBuilder{item("subj1" -> "value1")}), 1 second)
+      res1 should be (Array("1","2","4","5"))
     }
     /*"string interpolation is supported only for globals" in {
       intercept[RuntimeException]{
