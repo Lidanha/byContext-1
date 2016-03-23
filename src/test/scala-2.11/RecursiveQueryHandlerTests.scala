@@ -1,18 +1,31 @@
-import rules.{Creators}
 import byContext.exceptions.ByContextError
 import byContext.model.QueryContext
 import byContext.queryHandler.RecursiveQueryHandler
 import byContext.score.valueContainers.{ArrayValueContainer, ObjectValueContainer, SingleValueContainer}
-import byContext.writers.map.MapRootWriterFactory
+import byContext.writers.Writer
+import byContext.writers.map.MapObjectWriter
 import org.scalatest.{Matchers, WordSpecLike}
+import rules.Creators
 
+import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
 
 class RecursiveQueryHandlerTests extends WordSpecLike with Matchers with Creators{
   def input(map:Map[String,Any]) : Any = {
-    val writer = new MapRootWriterFactory()
+    val result = mutable.Map[String, Any]()
+    val writer = new Writer{
+      override def write(value: Any): Unit = ???
+
+      override def getCollectionWriter(): Writer = ???
+
+      override def getObjectWriter(): Writer = new MapObjectWriter(result)
+
+      override def getPropertyWriter(propertyName: String): Writer = ???
+    }
+
     new RecursiveQueryHandler().query(emptyCTX,map, writer)
-    writer.getValue
+
+    result
   }
   def single(value:Any): SingleValueContainer = new SingleValueContainer {
     override def get(ctx: QueryContext): Either[ByContextError, Any] = Right(value)

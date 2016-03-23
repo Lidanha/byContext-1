@@ -24,9 +24,10 @@ class DefaultDataSetHandler(queryHandler: QueryHandler) extends DataSetHandler w
     val ctx = new QueryContextImpl(q.queryParams,Seq.empty[QueryExtension])
 
     val rootResult = mutable.Map[String, Any]()
+
     val rootWriter = new MapObjectWriter(rootResult)
 
-    val dataWriter = rootWriter.getPropertyWriter("data")
+    val dataWriter = rootWriter.getPropertyWriter("query-result")
     queryHandler.query(ctx, value,dataWriter)
     rootResult.toMap
   }

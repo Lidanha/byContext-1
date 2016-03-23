@@ -77,65 +77,65 @@ class SyncInMemoryAPITests extends WordSpecLike with Matchers with ScalaCodeData
   "SyncInMemoryAPI with RecursiveQueryHandler" must {
     "return simple raw value a couple of levels deep" in {
       val res = Await.result(api.get("3.1.1",QueryBuilder()), 1 second)
-      res should be (Map("data"->"3.1.1"))
+      res should be (Map("query-result"->"3.1.1"))
     }
     "select the relevant value a couple of levels deep" in {
       
       val res = Await.result(api.get("3.1.2",new QueryBuilder{item("subj1" -> "value1")}), 1 second)
-      res should be (Map("data"->"1"))
+      res should be (Map("query-result"->"1"))
     }
     "select the relevant value with a NOT container rule" in {
       val res = Await.result(api.get("3.1.2",new QueryBuilder{item("subj2" -> "value1")}), 1 second)
-      res should be (Map("data"->"3"))
+      res should be (Map("query-result"->"3"))
     }
     "select the relevant values of an array" in {
       val res1 = Await.result(api.get("3.2.1",new QueryBuilder{item("subj1" -> "value1")}), 1 second)
-      res1 should be (Map("data"->Iterable("1","2","4","5")))
+      res1 should be (Map("query-result"->Iterable("1","2","4","5")))
 
       val res1_2 = Await.result(api.get("3.2.1",new QueryBuilder{
         item("subj1" -> "value1")
         item("subj2" -> "value2")
       }), 1 second)
-      res1_2 should be (Map("data"->Iterable("1","2","4","5")))
+      res1_2 should be (Map("query-result"->Iterable("1","2","4","5")))
 
       val res1_1 = Await.result(api.get("3.2.1",new QueryBuilder{
         item("subj1" -> "value1")
         item("subj2" -> "some_val")
       }), 1 second)
-      res1_1 should be (Map("data"->Iterable("1","4")))
+      res1_1 should be (Map("query-result"->Iterable("1","4")))
 
       val res2 = Await.result(api.get("3.2.1",new QueryBuilder{item("subj1" -> "value2")}), 1 second)
-      res2 should be (Map("data"->Iterable("2","3","5")))
+      res2 should be (Map("query-result"->Iterable("2","3","5")))
 
       val res2_1 = Await.result(api.get("3.2.1",new QueryBuilder{
         item("subj1" -> "value2")
         item("subj2" -> "value2")
       }), 1 second)
-      res2 should be (Map("data"->Iterable("2","3","5")))
+      res2 should be (Map("query-result"->Iterable("2","3","5")))
 
       val res3 = Await.result(api.get("3.2.1",new QueryBuilder{item("subj2" -> "value2")}), 1 second)
-      res3 should be (Map("data"->Iterable("1","2","3","4","5")))
+      res3 should be (Map("query-result"->Iterable("1","2","3","4","5")))
     }
     "complex and or combination" in {
       Await.result(api.get("4",new QueryBuilder{
         item("subj1" -> "value1")
         item("subj2"->"some-value")
         item("ss"->23)
-      }), 1 second) should be (Map("data"->"1"))
+      }), 1 second) should be (Map("query-result"->"1"))
 
       Await.result(api.get("4",new QueryBuilder{
         item("subj1" -> "value1")
         item("subj2"->"oo")
-      }), 1 second) should be (Map("data"->"2"))
+      }), 1 second) should be (Map("query-result"->"2"))
 
-      Await.result(api.get("4",new QueryBuilder{item("ss"->22)}), 1 second) should be (Map("data"->"1"))
-      Await.result(api.get("4",new QueryBuilder{item("ss"->2)}), 1 second) should be (Map("data"->"2"))
+      Await.result(api.get("4",new QueryBuilder{item("ss"->22)}), 1 second) should be (Map("query-result"->"1"))
+      Await.result(api.get("4",new QueryBuilder{item("ss"->2)}), 1 second) should be (Map("query-result"->"2"))
 
       Await.result(api.get("4",new QueryBuilder{
         item("subj1" -> "value1")
         item("subj2"->"aa")
         item("subj3"->34)
-      }), 1 second) should be (Map("data"->"1"))
+      }), 1 second) should be (Map("query-result"->"1"))
     }
     "complex and or combination - 2" in {
       val api1 = EmbeddedAPIBuilder(Map(
@@ -147,40 +147,40 @@ class SyncInMemoryAPITests extends WordSpecLike with Matchers with ScalaCodeData
         item("subj1" -> "value1")
         item("subj2"->"aa")
         item("subj3"->34)
-      }), 1 second) should be (Map("data"->"1"))
+      }), 1 second) should be (Map("query-result"->"1"))
     }
     "(text match and number smaller than or equals) or (text match and number smaller than or equals)" in {
       Await.result(api.get("4",new QueryBuilder{
         item("subj1"->"value1")
         item("subjNum"->7)
-      }), 1 second) should be (Map("data"->"1"))
+      }), 1 second) should be (Map("query-result"->"1"))
     }
     "value ref" in {
       val res = Await.result(api.get("ref",new QueryBuilder{
         item("subj1" -> "value1")
         item("subj2" -> "some_val")
       }), 1 second)
-      res should be (Map("data"->"value-to-be-referenced"))
+      res should be (Map("query-result"->"value-to-be-referenced"))
     }
     "string interpolation" in {
       val res = Await.result(api.get("stringInterpolation",new QueryBuilder()), 1 second)
-      res should be (Map("data"->"test interpolated simple-string !!!"))
+      res should be (Map("query-result"->"test interpolated simple-string !!!"))
     }
     "string interpolation with interpolated value filtered" in {
       val res = Await.result(api.get("stringInterpolation_filtered",new QueryBuilder{
         item("subj1"->"v1")
       }), 1 second)
-      res should be (Map("data"->"test interpolated inter1 !!!"))
+      res should be (Map("query-result"->"test interpolated inter1 !!!"))
     }
     "string interpolation with empty and filtered interpolated value" in {
       val res = Await.result(api.get("stringInterpolation_filtered",new QueryBuilder{
         item("subj1"->"v3")
       }), 1 second)
-      res should be (Map("data"->"test interpolated  !!!"))
+      res should be (Map("query-result"->"test interpolated  !!!"))
     }
     "collect metadata" in {
       val res1 = Await.result(api.get("3.2.1",new QueryBuilder{item("subj1" -> "value1")}), 1 second)
-      res1 should be (Map("data"->Iterable("1","2","4","5")))
+      res1 should be (Map("query-result"->Iterable("1","2","4","5")))
     }
     /*"string interpolation is supported only for globals" in {
       intercept[RuntimeException]{
