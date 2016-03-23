@@ -3,6 +3,6 @@ package byContext.dataSetHandler
 import byContext.model.Query
 
 trait DataSetHandler {
-  def get(path:String, query: Query) : Any
+  def get(path:String, query: Query) : Map[String,Any]
 }
 
