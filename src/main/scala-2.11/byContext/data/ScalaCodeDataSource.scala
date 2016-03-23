@@ -32,10 +32,6 @@ trait Filters{
 }
 
 trait RulesBuilders{
-  implicit def possibleValue(value: Any) = new {
-    def relevantWhen(rule:FilterRule) : PossibleValue = PossibleValue(value, Some(rule))
-  }
-
   implicit def tupleToRule(tuple: Tuple1[FilterRule]) = tuple._1
 
   implicit def textRules(subject: String) = new {
@@ -58,19 +54,16 @@ trait ScalaCodeDataSource extends Filters with RulesBuilders{
 
   implicit def possibleValueBuilder(value:Any) = new PossibleValueBuilder(value)
 
-  trait PossibleValueSettingsBuilder extends WithRules with WithMetadata{
+  trait PossibleValueSettingsBuilder extends WithRules {
     def defaultValue : PossibleValueSettingsBuilder
+    def withMetadata(items: (String, Any)*): PossibleValueSettingsBuilder
     private[data] def buildPossibleValue : PossibleValue
   }
   trait WithRules{
     def withRules(rule:FilterRule) : PossibleValueSettingsBuilder
   }
-  trait WithMetadata{
-    def withMetadata(metadata:(String,Any)*): PossibleValueSettingsBuilder
-  }
 
   implicit def possibleValueExtractor(builder:PossibleValueSettingsBuilder) : PossibleValue = builder.buildPossibleValue
-
 
   class PossibleValueBuilder(val value:Any) extends PossibleValueSettingsBuilder {
     var isDefault = false
@@ -90,11 +83,10 @@ trait ScalaCodeDataSource extends Filters with RulesBuilders{
       this
     }
 
-    /*override def withRules(rule:FilterRule) : PossibleValue =
-      PossibleValue(value,Some(rule), PossibleValueSettings(isDefault = this.isDefault))*/
-    override def buildPossibleValue: PossibleValue = PossibleValue(value,rule, PossibleValueSettings(isDefault = this.isDefault))
+    override def buildPossibleValue: PossibleValue =
+      PossibleValue(value,rule, PossibleValueSettings(isDefault = this.isDefault))
 
-    override def withMetadata(items: (String, Any)*): PossibleValueSettingsBuilder = {
+    def withMetadata(items: (String, Any)*): PossibleValueSettingsBuilder = {
       metadata = Some(items.toMap)
       this
     }

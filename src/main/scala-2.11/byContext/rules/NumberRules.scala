@@ -4,7 +4,7 @@ import byContext.model.{FilterRule, Probe, ValueRelevancy, QueryContext}
 
 abstract class NumberRule(val subj:String, val v:Double) extends FilterRule {
   override def evaluate(ctx: QueryContext, probe: Probe): Unit = {
-    val valueRelevancy = ctx.getAs[Double](subj)
+    val valueRelevancy = ctx.getQueryParamAs[Double](subj)
       .fold(ValueRelevancy.Neutral){
         contextValue =>
           if (operator(contextValue, v)) ValueRelevancy.Relevant else ValueRelevancy.NotRelevant

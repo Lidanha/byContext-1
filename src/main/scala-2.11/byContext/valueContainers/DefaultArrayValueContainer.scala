@@ -1,7 +1,7 @@
 package byContext.score.valueContainers
 
 import byContext.exceptions.{MinimumResultItemsCountError, ByContextError}
-import byContext.model.{PossibleValue, QueryContext}
+import byContext.model.{ValueSelected, PossibleValue, QueryContext}
 import byContext.rawInputHandling.{DataSetItem, DataSetItemConverter}
 import byContext.score.{ScoreCalculator}
 
@@ -17,7 +17,7 @@ class DefaultArrayValueContainer(path:String, calculator: ScoreCalculator,
         Right(res.view.zipWithIndex.map{
           x=>
             val (v,index) = x
-            ctx.valueSelected(s"$path [$index]",metadata = v.possibleValue.metadata)
+            ctx.notify(ValueSelected(s"$path [$index]",metadata = v.possibleValue.metadata))
             v.possibleValue.value
         }.toArray)
     }

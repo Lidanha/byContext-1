@@ -4,20 +4,20 @@ import byContext.api.{EmbeddedAPIBuilder, QueryBuilder}
 import byContext.data.ScalaCodeDataSource
 import byContext.score.DefaultScoreCalculator
 import org.scalatest.{Matchers, WordSpecLike}
-import rules.{ContextHelper, WireupHelpers}
+import rules.{WireupHelpers}
 
 import scala.concurrent.duration._
 import scala.concurrent.{Await, ExecutionContext}
-class SyncInMemoryAPITests extends WordSpecLike with Matchers with ScalaCodeDataSource with ContextHelper with WireupHelpers{
+class SyncInMemoryAPITests extends WordSpecLike with Matchers with ScalaCodeDataSource with WireupHelpers{
   implicit val scoreCalculator = new DefaultScoreCalculator()
   val globals = Map(
     "simple-string-to-interpolate" -> "simple-string",
     "filtered-string-to-interpolate" -> Map(
       "1"->Map(
         "4"->filterSingle(
-          "inter1"  relevantWhen("subj1" is "v1"),
-          "inter2"  relevantWhen("subj1" is "v2"),
-          ""        relevantWhen("sub1" is "v3")
+          "inter1"  withRules("subj1" is "v1"),
+          "inter2"  withRules("subj1" is "v2"),
+          ""        withRules("sub1" is "v3")
         )(true)
       )
     ),
@@ -34,21 +34,21 @@ class SyncInMemoryAPITests extends WordSpecLike with Matchers with ScalaCodeData
       "1"->Map(
         "1"->"3.1.1",
         "2"->filterSingle(
-          "1" relevantWhen("subj1" is "value1"),
-          "2" relevantWhen("subj2" is "value2"),
-          "3" relevantWhen("subj2" isNot "value2")
+          "1".withRules("subj1" is "value1"),
+          "2".withRules("subj2" is "value2"),
+          "3".withRules("subj2" isNot "value2")
         )(true),
         "3"->filterSingle(
-          "1" relevantWhen("subj1" isNot "value1")
+          "1".withRules("subj1" isNot "value1")
         )(true)
       ),
       "2"-> Map(
         "1" -> filterArray(
-          "1" relevantWhen("subj1" is "value1") withMetadata("ver"->1,"id"->"id_1"),
-          "2" relevantWhen("subj2" is "value2") withMetadata("ver"->2,"id"->"id_2"),
-          "3" relevantWhen("subj1" is "value2") withMetadata("ver"->3,"id"->"id_3"),
-          "4" relevantWhen("subj1" is "value1") withMetadata("ver"->4,"id"->"id_4"),
-          "5" relevantWhen("subj2" is "value2") withMetadata("ver"->5,"id"->"id_5")
+          "1" withRules("subj1" is "value1") withMetadata("ver"->1,"id"->"id_1"),
+          "2" withRules("subj2" is "value2") withMetadata("ver"->2,"id"->"id_2"),
+          "3" withRules("subj1" is "value2") withMetadata("ver"->3,"id"->"id_3"),
+          "4" withRules("subj1" is "value1") withMetadata("ver"->4,"id"->"id_4"),
+          "5" withRules("subj2" is "value2") withMetadata("ver"->5,"id"->"id_5")
         )(1)
       )
     ),

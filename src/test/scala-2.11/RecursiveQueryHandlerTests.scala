@@ -1,4 +1,4 @@
-import _root_.rules.ContextHelper
+import rules.{Creators}
 import byContext.exceptions.ByContextError
 import byContext.model.QueryContext
 import byContext.queryHandler.RecursiveQueryHandler
@@ -8,10 +8,10 @@ import org.scalatest.{Matchers, WordSpecLike}
 
 import scala.collection.mutable.ListBuffer
 
-class RecursiveQueryHandlerTests extends WordSpecLike with Matchers with ContextHelper{
+class RecursiveQueryHandlerTests extends WordSpecLike with Matchers with Creators{
   def input(map:Map[String,Any]) : Any = {
     val writer = new MapRootWriterFactory()
-    new RecursiveQueryHandler().query(emptyContext,map, writer)
+    new RecursiveQueryHandler().query(emptyCTX,map, writer)
     writer.getValue
   }
   def single(value:Any): SingleValueContainer = new SingleValueContainer {

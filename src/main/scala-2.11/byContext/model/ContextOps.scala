@@ -1,5 +1,5 @@
 package byContext.model
 
 trait ContextOps {
-  def valueSelected(path:String, metadata:Map[String,Any])
+  def notify[E<:Event](e:E): Unit
 }

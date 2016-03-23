@@ -8,7 +8,7 @@ object TextMatch{
 }
 case class TextMatch(val subject:String, val value:String, caseSensitive:Boolean) extends FilterRule {
   override def evaluate(ctx: QueryContext, probe: Probe): Unit = {
-    val valueRelevancy = ctx.getAs[String](subject)
+    val valueRelevancy = ctx.getQueryParamAs[String](subject)
       .fold(ValueRelevancy.Neutral){
         contextValue =>
           if(caseSensitive){

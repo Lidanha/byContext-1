@@ -1,3 +1,3 @@
 package byContext.exceptions
 
-case class StringInterpolationFailed(msg:String) extends ByContextError
+case class StringInterpolationFailed(inner:Throwable) extends ByContextError

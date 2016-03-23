@@ -1,16 +1,15 @@
 package rules
 
-import byContext.model.{Probe, ValueRelevancy}
-import ValueRelevancy._
-import byContext.api.QueryBuilder
 import byContext.data.ScalaCodeDataSource
+import byContext.model.Probe
+import byContext.model.ValueRelevancy._
 import byContext.rules._
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.{Matchers, WordSpecLike}
 
 import scala.collection.mutable.ListBuffer
 
-class RulesCombinationsTests extends WordSpecLike with Matchers with RulesTestsHelper with MockFactory with ContextHelper{
+class RulesCombinationsTests extends WordSpecLike with Matchers with RulesTestsHelper with MockFactory with Creators{
   "rules combinations" must {
     "or -> and -> simple" in {
       val rule =
@@ -26,7 +25,7 @@ class RulesCombinationsTests extends WordSpecLike with Matchers with RulesTestsH
       (probe setRelevancy _).expects(Neutral).once()
       (probe setRelevancy _).expects(Relevant).twice()
 
-      rule.evaluate(emptyContext,probe)
+      rule.evaluate(emptyCTX,probe)
     }
     "complex" in {
       val rule =
@@ -44,7 +43,7 @@ class RulesCombinationsTests extends WordSpecLike with Matchers with RulesTestsH
       val probe = mock[Probe]
       (probe setRelevancy _).expects(Relevant) repeated 4 times
 
-      rule.evaluate(emptyContext,probe)
+      rule.evaluate(emptyCTX,probe)
     }
     "complex from api tests" in {
       val x= new ScalaCodeDataSource{}
@@ -57,7 +56,7 @@ class RulesCombinationsTests extends WordSpecLike with Matchers with RulesTestsH
       val p = new Probe {
         override def setRelevancy(r: ValueRelevancy): Unit = rels += r
       }
-      rule.evaluate(new QueryBuilder{item("subj1"->"value1")}, p)
+      rule.evaluate(ctx("subj1"->"value1"), p)
 
       rels.count(_ == Relevant) should be (1)
     }
@@ -72,10 +71,7 @@ class RulesCombinationsTests extends WordSpecLike with Matchers with RulesTestsH
       val p = new Probe {
         override def setRelevancy(r: ValueRelevancy): Unit = rels += r
       }
-      rule.evaluate(new QueryBuilder{
-        item("subj1"->"value1")
-        item("subjNum"->9)
-      }, p)
+      rule.evaluate(ctx("subj1"->"value1", "subjNum"->9), p)
 
       rels.size should be (2)
       rels.count(_ == Relevant) should be (2)

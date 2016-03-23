@@ -2,7 +2,7 @@ package byContext.score.valueContainers
 
 import byContext.defaultValueSelection.DefaultValueSelector
 import byContext.exceptions.{ByContextError, RequiredValueMissingError}
-import byContext.model.{PossibleValue, QueryContext}
+import byContext.model.{ValueSelected, PossibleValue, QueryContext}
 import byContext.rawInputHandling.{DataSetItem, DataSetItemConverter}
 import byContext.score._
 
@@ -13,13 +13,13 @@ class DefaultSingleValueContainer(path:String, calculator: ScoreCalculator, poss
     calculator.calculate(ctx, possibleValues) match {
       case res if res.size == 1 =>
         val selected = res.head.possibleValue
-        ctx.valueSelected(path, selected.metadata)
+        ctx.notify(ValueSelected(path, selected.metadata))
         Right(selected.value)
       case res if res.size > 1 =>
         defaultValueSelector.select(res) match {
           case Right(valueWithScore) =>
             val selected = valueWithScore.possibleValue
-            ctx.valueSelected(path, selected.metadata)
+            ctx.notify(ValueSelected(path, selected.metadata))
             Right(selected.value)
           case left @ Left(err) => left
         }

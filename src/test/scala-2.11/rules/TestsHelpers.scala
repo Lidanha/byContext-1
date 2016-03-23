@@ -1,6 +1,5 @@
 package rules
 
-import byContext.api.QueryBuilder
 import byContext.index.{DataIndex, IndexBuilderInspector, MapDataIndex}
 import byContext.model._
 import byContext.rawInputHandling.DataSetVisitor
@@ -23,10 +22,6 @@ trait RulesTestsHelper {
 
 }
 
-trait ContextHelper{
-  val emptyContext = new QueryBuilder()
-}
-
 trait WireupHelpers{
   def toIndex (data:Map[String,Any]) : DataIndex = {
     val indexBuilder = new IndexBuilderInspector()
@@ -39,5 +34,17 @@ trait WireupHelpers{
 trait Creators{
   def valueWithScore(v:Any, score:Int, isDefault:Boolean=false)=
     ValueWithScore(PossibleValue(v,None,PossibleValueSettings(isDefault)),score)
+  val emptyCTX = ctx()
+  def ctx(items:(String,Any)*) = new QueryContext {
+    val map = items.map{
+      x=>
+        if(x._2.isInstanceOf[Int]) (x._1, x._2.asInstanceOf[Int].toDouble) else x
+    }.toMap
+    override def getQueryParamAs[T](key: String): Option[T] = {
+      map.get(key).map(_.asInstanceOf[T])
+    }
+
+    override def notify[E <: Event](e: E): Unit = {}
+  }
 }
 

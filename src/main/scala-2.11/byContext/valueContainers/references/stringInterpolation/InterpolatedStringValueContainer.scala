@@ -15,7 +15,8 @@ class InterpolatedStringValueContainer(val value:String, val substitutes:Seq[Sub
       interpolate(ctx)
     } match {
       case Success(interpolated)=> Right(interpolated)
-      case Failure(t) => Left(StringInterpolationFailed(t.getMessage))
+      case Failure(t) =>
+        Left(StringInterpolationFailed(t))
     }
   }
 

@@ -1,8 +1,8 @@
 package byContext.dataSetHandler
 
-import byContext.model.QueryContext
+import byContext.model.Query
 
 trait DataSetHandler {
-  def get(path:String, queryContext: QueryContext) : Any
+  def get(path:String, query: Query) : Any
 }
 
