@@ -84,7 +84,7 @@ trait ScalaCodeDataSource extends Filters with RulesBuilders{
     }
 
     override def buildPossibleValue: PossibleValue =
-      PossibleValue(value,rule, PossibleValueSettings(isDefault = this.isDefault))
+      PossibleValue(value,rule, PossibleValueSettings(isDefault = this.isDefault),metadata = metadata.getOrElse(Map.empty))
 
     def withMetadata(items: (String, Any)*): PossibleValueSettingsBuilder = {
       metadata = Some(items.toMap)

@@ -39,5 +39,6 @@ class MapPropertyWriter(val map:collection.mutable.Map[String,Any], propertyName
     throw new WriterUnsupportedOperationException("cannot call getPropertyWriter on PropertyWriter")
 
   private def validateDuplicatePropName(): Unit =
-    if(map.contains(propertyName)) throw new WriterUnsupportedOperationException(s"attempt to write a property that was already written - $propertyName")
+    if(map.contains(propertyName))
+      throw new WriterUnsupportedOperationException(s"attempt to write a property that was already written - $propertyName")
 }

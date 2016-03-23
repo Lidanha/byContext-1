@@ -1,5 +1,6 @@
 package api
 
+import byContext.MetadataCollectorExtensionFactory
 import byContext.api.{EmbeddedAPIBuilder, QueryBuilder}
 import byContext.data.ScalaCodeDataSource
 import byContext.score.DefaultScoreCalculator
@@ -23,7 +24,7 @@ class SyncInMemoryAPITests extends WordSpecLike with Matchers with ScalaCodeData
     ),
     "value-to-be-referenced" -> "value-to-be-referenced"
   )
-  val simpleIndex = Map(
+  val dataSet = Map(
     "1"->"1",
     "2"->Map(
       "1"->"2.1",
@@ -73,7 +74,7 @@ class SyncInMemoryAPITests extends WordSpecLike with Matchers with ScalaCodeData
 
   implicit val ec = ExecutionContext.global
 
-  val api = EmbeddedAPIBuilder(simpleIndex,Some(globals))
+  val api = EmbeddedAPIBuilder(dataSet,Some(globals))
   "SyncInMemoryAPI with RecursiveQueryHandler" must {
     "return simple raw value a couple of levels deep" in {
       val res = Await.result(api.get("3.1.1",QueryBuilder()), 1 second)
@@ -178,9 +179,65 @@ class SyncInMemoryAPITests extends WordSpecLike with Matchers with ScalaCodeData
       }), 1 second)
       res should be (Map("query-result"->"test interpolated  !!!"))
     }
-    "collect metadata" in {
-      val res1 = Await.result(api.get("3.2.1",new QueryBuilder{item("subj1" -> "value1")}), 1 second)
-      res1 should be (Map("query-result"->Iterable("1","2","4","5")))
+    "collect metadata version field" in {
+
+      val api1 = EmbeddedAPIBuilder(dataSet,Some(globals),Map("version"->new MetadataCollectorExtensionFactory("ver")))
+
+      val query = new QueryBuilder{item("subj1" -> "value1")} withExtensions Seq("version")
+
+      val res1 = Await.result(api1.get("3.2.1",query), 1 second)
+
+      res1.get("query-result") should be (Some(Iterable("1","2","4","5")))
+      res1.get("version") should be (Some(Map(
+        "3.2.1 [0]"->1,
+        "3.2.1 [1]"->2,
+        "3.2.1 [2]"->4,
+        "3.2.1 [3]"->5
+      ))
+      )
+    }
+    "collect metadata id field" in {
+
+      val api1 = EmbeddedAPIBuilder(dataSet,Some(globals),Map("id-collector"->new MetadataCollectorExtensionFactory("id")))
+
+      val query = new QueryBuilder{item("subj1" -> "value1")} withExtensions Seq("id-collector")
+
+      val res1 = Await.result(api1.get("3.2.1",query), 1 second)
+
+      res1.get("query-result") should be (Some(Iterable("1","2","4","5")))
+      res1.get("id-collector") should be (Some(Map(
+        "3.2.1 [0]"->"id_1",
+        "3.2.1 [1]"->"id_2",
+        "3.2.1 [2]"->"id_4",
+        "3.2.1 [3]"->"id_5"
+      ))
+      )
+    }
+    "collect metadata id and version fields" in {
+
+      val api1 = EmbeddedAPIBuilder(dataSet,Some(globals),Map(
+        "id-collector"->new MetadataCollectorExtensionFactory("id"),
+        "version"->new MetadataCollectorExtensionFactory("ver")
+      ))
+
+      val query = new QueryBuilder{item("subj1" -> "value1")} withExtensions Seq("id-collector", "version")
+
+      val res1 = Await.result(api1.get("3.2.1",query), 1 second)
+
+      res1.get("query-result") should be (Some(Iterable("1","2","4","5")))
+      res1.get("id-collector") should be (Some(Map(
+        "3.2.1 [0]"->"id_1",
+        "3.2.1 [1]"->"id_2",
+        "3.2.1 [2]"->"id_4",
+        "3.2.1 [3]"->"id_5"
+      ))
+      )
+      res1.get("version") should be (Some(Map(
+        "3.2.1 [0]"->1,
+        "3.2.1 [1]"->2,
+        "3.2.1 [2]"->4,
+        "3.2.1 [3]"->5
+      )))
     }
     /*"string interpolation is supported only for globals" in {
       intercept[RuntimeException]{

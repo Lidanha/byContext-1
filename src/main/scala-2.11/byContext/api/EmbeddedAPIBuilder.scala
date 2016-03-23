@@ -3,6 +3,7 @@ package byContext.api
 import byContext.dataSetHandler.DefaultDataSetHandler
 import byContext.defaultValueSelection.{CompositeDefaultValueSelector, DefaultMarkedDefaultValueSelector, HighestScoreDefaultValueSelector}
 import byContext.index.{DataIndex, IndexBuilderInspector, MapDataIndex}
+import byContext.model.QueryExtensionFactory
 import byContext.queryHandler.RecursiveQueryHandler
 import byContext.rawInputHandling.{DataSetItemConverter, DataSetVisitor}
 import byContext.score.DefaultScoreCalculator
@@ -11,9 +12,11 @@ import byContext.valueContainers.references.{ValueRefContainerConverter, VerifyN
 import byContext.valueContainers.stringInterpolation.InterpolatedStringValueMarkerConverter
 
 object EmbeddedAPIBuilder {
-  def apply(dataSet:Map[String,Any], globals:Option[Map[String,Any]]=None):ByContextAPI = {
+  def apply(dataSet:Map[String,Any],
+            globals:Option[Map[String,Any]]=None,
+            queryExtensionFactories: Map[String,QueryExtensionFactory]=Map.empty):ByContextAPI = {
 
-    val dataSetHandler = new DefaultDataSetHandler(new RecursiveQueryHandler())
+    val dataSetHandler = new DefaultDataSetHandler(new RecursiveQueryHandler(), queryExtensionFactories)
     val scoreCalculator = new DefaultScoreCalculator()
     val defaultValueSelector = new CompositeDefaultValueSelector(Seq(
       new HighestScoreDefaultValueSelector(),new DefaultMarkedDefaultValueSelector()
