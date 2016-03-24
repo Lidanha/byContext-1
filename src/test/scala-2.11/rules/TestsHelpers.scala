@@ -1,9 +1,9 @@
 package rules
 
-import byContext.index.{DataIndex, IndexBuilderInspector, MapDataIndex}
+import byContext.index.{DataIndex, IndexBuilderInspector, MapDataIndex, TreeVisitor}
 import byContext.model._
-import byContext.rawInputHandling.DataSetVisitor
 import byContext.score.ValueWithScore
+import byContext.writers.Writer
 import org.scalamock.scalatest.MockFactory
 
 trait RulesTestsHelper {
@@ -25,8 +25,8 @@ trait RulesTestsHelper {
 trait WireupHelpers{
   def toIndex (data:Map[String,Any]) : DataIndex = {
     val indexBuilder = new IndexBuilderInspector()
-    val dataSetVisitor = new DataSetVisitor()
-    dataSetVisitor.visit(data, inspectors = Seq(indexBuilder))
+    val visitor = new TreeVisitor()
+    visitor.handle(data, Writer.NoOp, handlers = Seq(indexBuilder))
     new MapDataIndex(indexBuilder.getIndex)
   }
 

@@ -1,20 +1,19 @@
 package byContext.valueContainers.stringInterpolation
 
 import byContext.exceptions.ByContextError
-import byContext.index.{IndexItem, DataIndex}
+import byContext.index.{VisitContext, TreeNodeConverter, IndexItem, DataIndex}
 import byContext.model.QueryContext
-import byContext.rawInputHandling.{DataSetItem, DataSetItemConverter}
 import byContext.score.valueContainers.SingleValueContainer
 import byContext.utils.MapExtensions
 import com.typesafe.scalalogging.StrictLogging
 
-class InterpolatedStringValueMarkerConverter(globalsIndex:DataIndex) extends DataSetItemConverter with MapExtensions with StrictLogging{
+class InterpolatedStringValueMarkerConverter(globalsIndex:DataIndex)
+  extends MapExtensions with StrictLogging with TreeNodeConverter{
   val re = """<<.*>>""".r
 
-  override def convert: PartialFunction[DataSetItem, Any] = {
-    case DataSetItem(ownPath,_,marker:InterpolatedStringValueMarker) =>
-
-      val subs = buildSubsitutes(marker, ownPath)
+  override val convert: PartialFunction[(VisitContext, Any), Any] = {
+    case (ctx,marker:InterpolatedStringValueMarker) =>
+      val subs = buildSubsitutes(marker, ctx.absolutePath)
       new InterpolatedStringValueContainer(marker.value, subs)
   }
 

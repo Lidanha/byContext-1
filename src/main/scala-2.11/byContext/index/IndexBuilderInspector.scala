@@ -1,14 +1,11 @@
 package byContext.index
 
-import byContext.rawInputHandling.{DataSetItem, DataSetInspector}
-
-class IndexBuilderInspector extends DataSetInspector{
+class IndexBuilderInspector extends TreeNodeHandler{
   private val index = collection.mutable.Map[String,IndexItem]()
 
   def getIndex = index.toMap
 
-  override def inspect: PartialFunction[DataSetItem, Unit] = {
-    case DataSetItem(fullPath, nodeName, item: Any) =>
-      index += fullPath -> IndexItem(nodeName, item)
+  val handle: PartialFunction[(VisitContext, Any), Unit] = {
+    case (ctx,v)=>index += ctx.absolutePath -> IndexItem(ctx.nodeName, v)
   }
 }

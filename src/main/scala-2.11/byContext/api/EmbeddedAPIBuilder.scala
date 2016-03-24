@@ -2,14 +2,15 @@ package byContext.api
 
 import byContext.dataSetHandler.DefaultDataSetHandler
 import byContext.defaultValueSelection.{CompositeDefaultValueSelector, DefaultMarkedDefaultValueSelector, HighestScoreDefaultValueSelector}
-import byContext.index.{DataIndex, IndexBuilderInspector, MapDataIndex}
+import byContext.index._
 import byContext.model.QueryExtensionFactory
 import byContext.queryHandler.RecursiveQueryHandler
-import byContext.rawInputHandling.{DataSetItemConverter, DataSetVisitor}
 import byContext.score.DefaultScoreCalculator
 import byContext.score.valueContainers.{ArrayValueConverter, SingleValueConverter}
 import byContext.valueContainers.references.{ValueRefContainerConverter, VerifyNoRefMarkersConfigured}
 import byContext.valueContainers.stringInterpolation.InterpolatedStringValueMarkerConverter
+import byContext.writers.Writer
+import byContext.writers.map.MapRootWriter
 
 object EmbeddedAPIBuilder {
   def apply(dataSet:Map[String,Any],
@@ -22,12 +23,12 @@ object EmbeddedAPIBuilder {
       new HighestScoreDefaultValueSelector(),new DefaultMarkedDefaultValueSelector()
     ))
 
-    val converters = Seq(
+    val converters :Seq[TreeNodeConverter]= Seq(
       new SingleValueConverter(scoreCalculator, defaultValueSelector),
       new ArrayValueConverter(scoreCalculator)
     )
 
-    val refConverters: Seq[DataSetItemConverter] =
+    val refConverters: Seq[TreeNodeConverter] =
       globals
         .map{input =>
 
@@ -45,12 +46,15 @@ object EmbeddedAPIBuilder {
     dataSetHandler.loadIndex(dataIndex)
     new SyncInMemoryAPI(dataSetHandler)
   }
-  def buildIndex(input:Map[String,Any], converters:Seq[DataSetItemConverter]):DataIndex = {
+  def buildIndex(input:Map[String,Any], converters:Seq[TreeNodeConverter]):DataIndex = {
+    val rootWriter = new MapRootWriter
+    val treeVisitor = new TreeVisitor()
+    treeVisitor.handle(input, rootWriter, converters)
+
+    val convertedInput = rootWriter.getValue.asInstanceOf[Map[String,Any]]
+
     val indexBuilder = new IndexBuilderInspector()
-    new DataSetVisitor().visit(input,
-      inspectors = Seq(indexBuilder),
-      converters = converters
-    )
+    treeVisitor.handle(convertedInput,Writer.NoOp, handlers = Seq(indexBuilder))
     new MapDataIndex(indexBuilder.getIndex)
   }
 }

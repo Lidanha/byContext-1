@@ -1,8 +1,8 @@
 package byContext.score.valueContainers
 
 import byContext.exceptions.{MinimumResultItemsCountError, ByContextError}
+import byContext.index.{TreeNodeConverter, VisitContext}
 import byContext.model.{ValueSelected, PossibleValue, QueryContext}
-import byContext.rawInputHandling.{DataSetItem, DataSetItemConverter}
 import byContext.score.{ScoreCalculator}
 
 class DefaultArrayValueContainer(path:String, calculator: ScoreCalculator,
@@ -29,9 +29,9 @@ trait ArrayValueMarker{
   val minResultItemsCount:Int
 }
 
-class ArrayValueConverter(calculator: ScoreCalculator) extends DataSetItemConverter{
-  override def convert: PartialFunction[DataSetItem, Any] = {
-    case DataSetItem(currentPath,nodeName,marker:ArrayValueMarker) =>
-      new DefaultArrayValueContainer(currentPath,calculator,marker.possibleValues, marker.minResultItemsCount)
+class ArrayValueConverter(calculator: ScoreCalculator) extends TreeNodeConverter{
+  val convert : PartialFunction[(VisitContext,Any),Any] = {
+    case (ctx,marker:ArrayValueMarker) =>
+      new DefaultArrayValueContainer(ctx.absolutePath,calculator,marker.possibleValues, marker.minResultItemsCount)
   }
 }

@@ -1,14 +1,14 @@
 package byContext.valueContainers.references
 
-import byContext.rawInputHandling.{DataSetItem, DataSetItemConverter}
+import byContext.index.{VisitContext, TreeNodeConverter}
 import byContext.valueContainers.ValueRefMarker
 import byContext.valueContainers.stringInterpolation.InterpolatedStringValueMarker
 
-object VerifyNoRefMarkersConfigured extends DataSetItemConverter{
-  override def convert: PartialFunction[DataSetItem, Any] = {
-    case DataSetItem(_,_,marker:InterpolatedStringValueMarker) =>
+object VerifyNoRefMarkersConfigured extends TreeNodeConverter{
+  override val convert: PartialFunction[(VisitContext, Any), Any] = {
+    case (_,m:InterpolatedStringValueMarker)=>
       throw new RuntimeException(s"string interpolation is supported only for globals")
-    case DataSetItem(_,_,marker:ValueRefMarker) =>
+    case (_,m:ValueRefMarker)=>
       throw new RuntimeException(s"value references is supported only for globals")
   }
 }

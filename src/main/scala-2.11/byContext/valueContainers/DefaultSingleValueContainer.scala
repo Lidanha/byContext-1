@@ -2,8 +2,8 @@ package byContext.score.valueContainers
 
 import byContext.defaultValueSelection.DefaultValueSelector
 import byContext.exceptions.{ByContextError, RequiredValueMissingError}
+import byContext.index.{TreeNodeConverter, VisitContext}
 import byContext.model.{ValueSelected, PossibleValue, QueryContext}
-import byContext.rawInputHandling.{DataSetItem, DataSetItemConverter}
 import byContext.score._
 
 class DefaultSingleValueContainer(path:String, calculator: ScoreCalculator, possibleValues:Array[PossibleValue],
@@ -34,12 +34,12 @@ trait SingleValueMarker{
   val isRequired:Boolean
 }
 
-class SingleValueConverter(scoreCalculator: ScoreCalculator, defaultValueSelector: DefaultValueSelector) extends DataSetItemConverter {
-  override def convert: PartialFunction[DataSetItem, Any] = {
-    case DataSetItem(currentPath,nodeName,marker:SingleValueMarker) =>
-      new DefaultSingleValueContainer(
-        currentPath,scoreCalculator,marker.possibleValues,
-        defaultValueSelector,marker.isRequired
-      )
+class SingleValueConverter(scoreCalculator: ScoreCalculator, defaultValueSelector: DefaultValueSelector)
+  extends TreeNodeConverter{
+  override val convert:PartialFunction[(VisitContext,Any),Any] = {
+    case (visitContext, marker:SingleValueMarker)=>new DefaultSingleValueContainer(
+      visitContext.absolutePath,scoreCalculator,marker.possibleValues,
+      defaultValueSelector,marker.isRequired
+    )
   }
 }
